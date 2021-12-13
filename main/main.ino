@@ -50,6 +50,18 @@ DallasTemperature sensors(&oneWire);
 float water_temperature;
 
 /*
+    RTD WATER TEMPERATURE SENSOR
+ */
+const int rtd_address = 102;
+byte rtd_code = 0;                  
+char rtd_data[20];          
+byte rtd_in_char = 0;            
+byte rtd_i = 0;                    
+int rtd_time_ = 600;              
+float rtd_tmp_float;              
+
+
+/*
    PH SENSOR VARIABLES
 */
 const int ph_address = 99;
@@ -195,13 +207,15 @@ void loop() {
 
   ec_wire_transmission();
 
-  get_water_temp();
+  //get_water_temp();
+
+  rtd_wire_transmission();
 
   env_pressure();
 
-  get_atm_values();
+  //get_atm_values();
 
-  get_gps_data();
+  //get_gps_data();
 
   read_battery_level();
 

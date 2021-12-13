@@ -94,6 +94,36 @@ void ec_wire_transmission(){
 //  Serial.println(" --");
 }
 
+void rtd_wire_transmission(){
+  Wire.begin();
+  Wire.beginTransmission(rtd_address);
+  Wire.write("r");
+  Wire.endTransmission();
+  delay(rtd_time_);
+  Wire.requestFrom(rtd_address, 20, 1);
+  rtd_code = Wire.read();
+  while(Wire.available()){
+    rtd_in_char = Wire.read();
+    rtd_data[rtd_i] = rtd_in_char;
+    rtd_i++;
+    if(rtd_in_char == 0){
+      rtd_i = 0;
+      break;
+    }
+  }
+
+  /*
+   * DEBUGGING
+   */
+//  Serial.print("-- DISSOLVED OXYGEN: ");
+  _data[6] = (float)atof(rtd_data);
+//  Serial.print(_data[0]);
+//  Serial.println(" --");
+  /*
+   * DEBUGGING
+   */
+}
+
 void get_water_temp(){
   sensors.begin();
   sensors.requestTemperatures();
