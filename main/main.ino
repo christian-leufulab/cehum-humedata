@@ -155,5 +155,5 @@ void loop() {
 
   sleep_sensors();
   
-  LowPower.sleep(60*5*1000); // LowPower.sleep(60*5*1000);
+  LowPower.sleep(60*15*1000); // LowPower.sleep(60*5*1000);
 }
