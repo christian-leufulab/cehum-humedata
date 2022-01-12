@@ -1,14 +1,12 @@
 /*
-   TITLE: CEHUM - HUMEDATA
+   TITLE: CEHUM - HUMEDAT@ ATLAS
    AUTHOR: CHRISTIAN SANTIBÁÑEZ SOTO
    COMPANY: LEUFÜLAB
-   DATE: 23/04/2021
-   VERSION: 0.5
+   DATE: 12/01/2022
+   VERSION: 1
 */
 
-/*
-   LIBRARIES
-*/
+// Librerías
 #include <Wire.h>
 #include <Arduino_MKRENV.h>
 #include <SPI.h>
@@ -22,6 +20,7 @@
 #include "TinyGPS++.h"
 #include "IO_Definitions.h"
 
+// Unidades de medida
 /*
   [0]  --> DISSOLVED OXYGEN          [mg/L]
   [1]  --> PH                        [-]
@@ -43,15 +42,21 @@
 
 void setup() {
   Serial.begin(115200);
+  pinMode(off_pin, OUTPUT);
+  digitalWrite(off_pin, LOW);
   
   if (!modem.begin(AU915)) {
-    Serial.println("Failed to start module");
+    Serial.println("-- NO SE HA PODIDO INICIAR EL MÓDULO LORAWAN --");
     while (1) {}
   };
-  Serial.print("Your module version is: ");
-  Serial.println(modem.version());
-  Serial.print("Your device EUI is: ");
-  Serial.println(modem.deviceEUI());
+  
+  Serial.print("-- LA VERSIÓN DE TU MÓDULO ES: ");
+  Serial.print(modem.version());
+  Serial.println(" --");
+  
+  Serial.print("-- EL EUI DE TU DISPOSITIVO ES: ");
+  Serial.print(modem.deviceEUI());
+  Serial.println(" --");
 
   Serial.println(modem.sendMask("ff000001f000ffff00020000"));
   int connected = modem.joinOTAA(appEui, appKey);
@@ -79,6 +84,8 @@ void setup() {
 }
 
 void loop() {
+  digitalWrite(off_pin, HIGH);
+  
   do_wire_transmission();
 
   ph_wire_transmission();
@@ -146,14 +153,17 @@ void loop() {
   modem.write(_data_lorawan[13]);
   modem.write(_data_lorawan[14]);
   modem.write(_data_lorawan[15]);
+  
   err = modem.endPacket(true);
+
   if (err > 0) {
-    Serial.println("Message sent correctly!");
+    Serial.println("-- MENSAJE ENVIADO CORRECTAMENTE A TRAVÉS DE LORAWAN --");
   } else {
-    Serial.println("Error sending message :(");
+    Serial.println("-- ERROR ENVIANDO EL MENSAJE A TRAVÉS DE LORAWAN --");
   }
 
   sleep_sensors();
+  digitalWrite(off_pin, LOW);
   
   LowPower.sleep(60*15*1000); // LowPower.sleep(60*5*1000);
 }
