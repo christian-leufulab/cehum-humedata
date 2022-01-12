@@ -62,10 +62,10 @@ void setup() {
 
   modem.minPollInterval(300);
 
-  Serial1.begin(9600);
+//  Serial1.begin(9600);
 
-  delay(10000);
-  turn_on_gps();
+//  delay(10000);
+//  turn_on_gps();
   
   SPI.begin();
   delay(100);
@@ -75,6 +75,7 @@ void setup() {
   dataFile.println("DissolvedOxygen,pH,ElectricalConductivity,TotalDissolvedSolids,Salinity,RelativeDensity,WaterTemperature,InternalPressure,AtmosphericPressure,AtmosphericTemperature,Latitude,Longitude,InternalTemperature,InternalHumidity,BatteryLevel,ORP");
   dataFile.close();
   delay(100);
+  SPI.end();
 }
 
 void loop() {
@@ -92,7 +93,7 @@ void loop() {
 
   env_pressure();
 
-  //get_atm_values();
+  get_atm_values();
 
   //get_gps_data();
 
@@ -154,5 +155,5 @@ void loop() {
 
   sleep_sensors();
   
-  LowPower.sleep(60*5*1000);
+  LowPower.sleep(60*5*1000); // LowPower.sleep(60*5*1000);
 }

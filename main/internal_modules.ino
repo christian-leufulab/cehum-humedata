@@ -16,7 +16,7 @@ void env_pressure(){
 }
 
 void read_battery_level(){
-  batt_level = analogRead(A1);
+  batt_level = analogRead(A1) * 0.25;
   _data[14] = batt_level;
 }
 
@@ -25,6 +25,9 @@ void write_to_sd(float data0, float data1,float data2,float data3,float data4,
                 float data10, float data11, float data12, float data13, float data14,
                 float data15) 
   {
+  SPI.begin();
+  delay(100);
+  SD.begin(sd_cs_pin);
   dataFile = SD.open("log-0000.csv", FILE_WRITE);
   delay(1000);
   
@@ -62,6 +65,7 @@ void write_to_sd(float data0, float data1,float data2,float data3,float data4,
 
   dataFile.close();
   delay(1000);
+  SPI.end();
 }
 
 void get_time(){
