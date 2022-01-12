@@ -124,6 +124,26 @@ void rtd_wire_transmission(){
    */
 }
 
+void orp_wire_transmission(){
+  Wire.begin();
+  Wire.beginTransmission(orp_address);
+  Wire.write("r");
+  Wire.endTransmission();
+  delay(orp_time);
+  Wire.requestFrom(orp_address, 20, 1);
+  orp_code = Wire.read();
+  while(Wire.available()){
+    orp_in_char = Wire.read();
+    orp_data[orp_i] = orp_in_char;
+    orp_i++;
+    if(orp_in_char == 0){
+      orp_i = 0;
+      break;
+    }
+  }
+  _data[15] = (float)atof(orp_data);
+}
+
 void get_water_temp(){
   sensors.begin();
   sensors.requestTemperatures();

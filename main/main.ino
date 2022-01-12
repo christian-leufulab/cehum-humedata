@@ -18,122 +18,9 @@
 #include <DallasTemperature.h>
 #include <Adafruit_BMP280.h>
 #include <RTClib.h>
-
-
-/*
-   LORAWAN DATA VARIABLES
-*/
-LoRaModem modem;
-// String devEUI = "A8610A3233298409";
-String appEui = "70B3D57ED0042E7E";
-String appKey = "5ED7E15D4D31804F8E2A8C447CAE76CC";
-uint8_t _data_lorawan[12];
-
-/*
-   RTC DS3231
-*/
-RTC_DS3231 rtc;
-
-/*
-   EXTERNAL PRESSURE SENSOR BMP280
-*/
-Adafruit_BMP280 bmp;
-float atm_pressure;
-float atm_temperature;
-
-/*
-   WATER TEMPERATURE SENSOR DS18B20
-*/
-const int water_temp_pin = 3;
-OneWire oneWire(water_temp_pin);
-DallasTemperature sensors(&oneWire);
-float water_temperature;
-
-/*
-    RTD WATER TEMPERATURE SENSOR
- */
-const int rtd_address = 102;
-byte rtd_code = 0;                  
-char rtd_data[20];          
-byte rtd_in_char = 0;            
-byte rtd_i = 0;                    
-int rtd_time_ = 600;              
-float rtd_tmp_float;              
-
-
-/*
-   PH SENSOR VARIABLES
-*/
-const int ph_address = 99;
-byte ph_code = 0;
-char ph_data[20];
-byte ph_in_char = 0;
-byte ph_i = 0;
-int ph_time = 815;
-
-/*
-   ELECTRIC CONDUCTIVITY SENSOR VARIABLES
-*/
-const int ec_address = 100;
-byte ec_code = 0;
-char ec_data[32];
-byte ec_in_char = 0;
-byte ec_i = 0;
-int ec_time = 570;
-char *ec;
-char *tds;
-char *sal;
-char *sg;
-
-/*
-   DISSOLVED OXYGEN SENSOR VARIABLES
-*/
-const int do_address = 97;
-char *DO;
-char *sat;
-byte do_code = 0;
-char do_data[20];
-byte do_in_char = 0;
-byte do_i = 0;
-int do_time = 575;
-
-/*
-   MKR ENV SENSOR VARIABLES
-*/
-float internal_pressure = 0;
-float internal_temperature = 0;
-float internal_humidity = 0;
-
-const int sd_cs_pin = 4;
-File dataFile;
-float sd_data[14];
-
-/*
-   SIM808 VARIABLES
-*/
-char gps_data[128];
-byte gps_code = 0;
-byte gps_in_char = 0; 
-byte gps_i = 0;
-
-char *gps_left_waste;
-char *gps_lat;
-char *gps_lon;
-
-float gps_latitude = 0;
-float gps_longitude = 0;
-
-/*
-   BATTERY LEVEL
-*/
-const int batt_pin = A1;
-float batt_level = 0;
-
-/*
-   GENERAL VARIABLES
-*/
-const int _data_size = 15;
-float _data[_data_size];
+#include "ArduinoLowPower.h"
+#include "TinyGPS++.h"
+#include "IO_Definitions.h"
 
 /*
   [0]  --> DISSOLVED OXYGEN          [mg/L]
@@ -151,22 +38,12 @@ float _data[_data_size];
   [12] --> INTERNAL TEMPERATURE      [°C]
   [13] --> INTERNAL HUMIDITY         [%]
   [14] --> BATTERY LEVEL             [V]
+  [15] --> ORP                       [mV]
 */
 
 void setup() {
-  /*
-     DEBUGGING
-  */
   Serial.begin(115200);
-  Serial.println("-- SERIAL INITIATED --");
-  /*
-     DEBUGGING
-  */
-
   
-  /*
-   * 
-   */
   if (!modem.begin(AU915)) {
     Serial.println("Failed to start module");
     while (1) {}
@@ -195,7 +72,7 @@ void setup() {
   SD.begin(sd_cs_pin);
   dataFile = SD.open("log-0000.csv", FILE_WRITE);
   delay(1000);
-  dataFile.println("DissolvedOxygen,pH,ElectricalConductivity,TotalDissolvedSolids,Salinity,RelativeDensity,WaterTemperature,InternalPressure,AtmosphericPressure,AtmosphericTemperature,Latitude,Longitude,InternalTemperature,InternalHumidity,BatteryLevel");
+  dataFile.println("DissolvedOxygen,pH,ElectricalConductivity,TotalDissolvedSolids,Salinity,RelativeDensity,WaterTemperature,InternalPressure,AtmosphericPressure,AtmosphericTemperature,Latitude,Longitude,InternalTemperature,InternalHumidity,BatteryLevel,ORP");
   dataFile.close();
   delay(100);
 }
@@ -206,6 +83,8 @@ void loop() {
   ph_wire_transmission();
 
   ec_wire_transmission();
+
+  orp_wire_transmission();
 
   //get_water_temp();
 
@@ -228,12 +107,12 @@ void loop() {
   }
   Serial.println("]");
 
-  write_to_sd(_data[0],_data[1],_data[2],_data[3],_data[4],_data[5],_data[6],_data[7],_data[8],_data[9],_data[10],_data[11], _data[12], _data[13], _data[14]);
+  write_to_sd(_data[0],_data[1],_data[2],_data[3],_data[4],_data[5],_data[6],_data[7],_data[8],_data[9],_data[10],_data[11], _data[12], _data[13], _data[14], _data[15]);
   
 
   _data_lorawan[0]  = uint8_t(_data[0]  * 1);              // Dissolved Oxygen           K: 
-  _data_lorawan[1]  = uint8_t(_data[1]  * 18.21);          // pH                         K: 0.055
-  _data_lorawan[2]  = uint8_t((_data[2] + 20)*(255/70));   // Electrical Conductivity    K: ((70/255)-20)
+  _data_lorawan[1]  = uint8_t(_data[1]  * 255/14);         // pH                         K: 0.055
+  _data_lorawan[2]  = uint8_t(_data[2]  * 1);              // Electrical Conductivity    K: ((70/255)-20)
   _data_lorawan[3]  = uint8_t(_data[3]  * 1);              // Total Dissolved Solids     K:
   _data_lorawan[4]  = uint8_t(_data[4]  * 1);              // Salinity                   K:
   _data_lorawan[5]  = uint8_t(_data[5]  * 1);              // Relative Density           K:
@@ -246,6 +125,7 @@ void loop() {
   _data_lorawan[12] = uint8_t(_data[12] * 1);              // Internal Temperature       K:
   _data_lorawan[13] = uint8_t(_data[13] * 1);              // Internal Humidity          K:
   _data_lorawan[14] = uint8_t(_data[14] * 1);              // Battery Level              K:
+  _data_lorawan[15] = uint8_t(_data[15] * 1);              // ORP
 
   int err;
   modem.beginPacket();
@@ -264,18 +144,15 @@ void loop() {
   modem.write(_data_lorawan[12]);
   modem.write(_data_lorawan[13]);
   modem.write(_data_lorawan[14]);
+  modem.write(_data_lorawan[15]);
   err = modem.endPacket(true);
   if (err > 0) {
     Serial.println("Message sent correctly!");
   } else {
     Serial.println("Error sending message :(");
-    Serial.println("(you may send a limited amount of messages per minute, depending on the signal strength");
-    Serial.println("it may vary from 1 message every couple of seconds to 1 message every minute)");
   }
 
+  sleep_sensors();
   
-  delay(90000);
-
-  //  get_time();
-  //  delay(4000);
+  LowPower.sleep(60*5*1000);
 }
