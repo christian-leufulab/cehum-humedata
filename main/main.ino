@@ -118,21 +118,21 @@ void loop() {
   write_to_sd(_data[0],_data[1],_data[2],_data[3],_data[4],_data[5],_data[6],_data[7],_data[8],_data[9],_data[10],_data[11], _data[12], _data[13], _data[14], _data[15]);
   
 
-  _data_lorawan[0]  = uint8_t(_data[0]  * 1);              // Dissolved Oxygen           K: 
-  _data_lorawan[1]  = uint8_t(_data[1]  * 255/14);         // pH                         K: 0.055
-  _data_lorawan[2]  = uint8_t(_data[2]  * 1);              // Electrical Conductivity    K: ((70/255)-20)
-  _data_lorawan[3]  = uint8_t(_data[3]  * 1);              // Total Dissolved Solids     K:
-  _data_lorawan[4]  = uint8_t(_data[4]  * 1);              // Salinity                   K:
-  _data_lorawan[5]  = uint8_t(_data[5]  * 1);              // Relative Density           K:
-  _data_lorawan[6]  = uint8_t(_data[6]  * 1);              // Water Temperature          K:
-  _data_lorawan[7]  = uint8_t(_data[7]  * 1);              // Internal Pressure          K:
-  _data_lorawan[8]  = uint8_t(_data[8]  * 1);              // Atmospheric Pressure       K:
-  _data_lorawan[9]  = uint8_t(_data[9]  * 1);              // Atmospheric Temperature    K:
-  _data_lorawan[10] = uint8_t(_data[10] * 1);              // GPS Latitude               K:
-  _data_lorawan[11] = uint8_t(_data[11] * 1);              // GPS Longitude              K:
-  _data_lorawan[12] = uint8_t(_data[12] * 1);              // Internal Temperature       K:
-  _data_lorawan[13] = uint8_t(_data[13] * 1);              // Internal Humidity          K:
-  _data_lorawan[14] = uint8_t(_data[14] * 1);              // Battery Level              K:
+  _data_lorawan[0]  = uint8_t(_data[0]  * 1);              // Dissolved Oxygen           
+  _data_lorawan[1]  = uint8_t(_data[1]  * 255/14);         // pH                         
+  _data_lorawan[2]  = uint8_t(_data[2]  * 1);              // Electrical Conductivity    
+  _data_lorawan[3]  = uint8_t(_data[3]  * 1);              // Total Dissolved Solids    
+  _data_lorawan[4]  = uint8_t(_data[4]  * 1);              // Salinity                  
+  _data_lorawan[5]  = uint8_t(_data[5]  * 1);              // Relative Density         
+  _data_lorawan[6]  = uint8_t(_data[6]  * 1);              // Water Temperature          
+  _data_lorawan[7]  = uint8_t(_data[7]  * 1);              // Internal Pressure         
+  _data_lorawan[8]  = uint8_t(_data[8]  * 1);              // Atmospheric Pressure      
+  _data_lorawan[9]  = uint8_t(_data[9]  * 1);              // Atmospheric Temperature   
+  _data_lorawan[10] = uint8_t(_data[10] * 1);              // GPS Latitude               
+  _data_lorawan[11] = uint8_t(_data[11] * 1);              // GPS Longitude              
+  _data_lorawan[12] = uint8_t(_data[12] * 1);              // Internal Temperature      
+  _data_lorawan[13] = uint8_t(_data[13] * 1);              // Internal Humidity         
+  _data_lorawan[14] = uint8_t(_data[14] * 1);              // Battery Level              
   _data_lorawan[15] = uint8_t(_data[15] * 1);              // ORP
 
   int err;
