@@ -40,6 +40,10 @@
   [15] --> ORP                       [mV]
 */
 
+// TIEMPOS DE SLEEP Y DE CALENTAMIENTO (MINUTOS)
+const int sleep_time = 15; 
+const int warm_up_time = 5;
+
 void setup() {
   Serial.begin(115200);
   pinMode(off_pin, OUTPUT);
@@ -65,7 +69,7 @@ void setup() {
   Serial.print(connected);
   Serial.println(" --");
 
-  modem.minPollInterval(300);
+//   modem.minPollInterval(300);
 
 //  Serial1.begin(9600);
 
@@ -85,6 +89,7 @@ void setup() {
 
 void loop() {
   digitalWrite(off_pin, HIGH);
+
   
   do_wire_transmission();
 
@@ -118,22 +123,22 @@ void loop() {
   write_to_sd(_data[0],_data[1],_data[2],_data[3],_data[4],_data[5],_data[6],_data[7],_data[8],_data[9],_data[10],_data[11], _data[12], _data[13], _data[14], _data[15]);
   
 
-  _data_lorawan[0]  = uint8_t(_data[0]  * 1);              // Dissolved Oxygen           
-  _data_lorawan[1]  = uint8_t(_data[1]  * 255/14);         // pH                         
-  _data_lorawan[2]  = uint8_t(_data[2]  * 1);              // Electrical Conductivity    
-  _data_lorawan[3]  = uint8_t(_data[3]  * 1);              // Total Dissolved Solids    
-  _data_lorawan[4]  = uint8_t(_data[4]  * 1);              // Salinity                  
-  _data_lorawan[5]  = uint8_t(_data[5]  * 1);              // Relative Density         
-  _data_lorawan[6]  = uint8_t(_data[6]  * 1);              // Water Temperature          
-  _data_lorawan[7]  = uint8_t(_data[7]  * 1);              // Internal Pressure         
-  _data_lorawan[8]  = uint8_t(_data[8]  * 1);              // Atmospheric Pressure      
-  _data_lorawan[9]  = uint8_t(_data[9]  * 1);              // Atmospheric Temperature   
-  _data_lorawan[10] = uint8_t(_data[10] * 1);              // GPS Latitude               
-  _data_lorawan[11] = uint8_t(_data[11] * 1);              // GPS Longitude              
-  _data_lorawan[12] = uint8_t(_data[12] * 1);              // Internal Temperature      
-  _data_lorawan[13] = uint8_t(_data[13] * 1);              // Internal Humidity         
-  _data_lorawan[14] = uint8_t(_data[14] * 1);              // Battery Level              
-  _data_lorawan[15] = uint8_t(_data[15] * 1);              // ORP
+  _data_lorawan[0]  = uint8_t  (_data[0]  * 1);              // Dissolved Oxygen           
+  _data_lorawan[1]  = uint8_t  (_data[1]  * 255/14);         // pH                         
+  _data_lorawan[2]  = uint8_t  (_data[2]  * 1);              // Electrical Conductivity    
+  _data_lorawan[3]  = uint8_t  (_data[3]  * 1);              // Total Dissolved Solids    
+  _data_lorawan[4]  = uint8_t  (_data[4]  * 1);              // Salinity                  
+  _data_lorawan[5]  = uint8_t  (_data[5]  * 1);              // Relative Density         
+  _data_lorawan[6]  = uint8_t  (_data[6]  * 1);              // Water Temperature          
+  _data_lorawan[7]  = uint8_t  (_data[7]  * 1);              // Internal Pressure         
+  _data_lorawan[8]  = uint8_t  (_data[8]  * 1);              // Atmospheric Pressure      
+  _data_lorawan[9]  = uint8_t  (_data[9]  * 1);              // Atmospheric Temperature   
+  _data_lorawan[10] = uint16_t (_data[10] * 1);              // GPS Latitude               
+  _data_lorawan[11] = uint16_t (_data[11] * 1);              // GPS Longitude              
+  _data_lorawan[12] = uint8_t  (_data[12] * 1);              // Internal Temperature      
+  _data_lorawan[13] = uint8_t  (_data[13] * 1);              // Internal Humidity         
+  _data_lorawan[14] = uint8_t  (_data[14] * 1);              // Battery Level              
+  _data_lorawan[15] = uint16_t (_data[15] * 1);              // ORP
 
   int err;
   modem.beginPacket();
@@ -162,8 +167,9 @@ void loop() {
     Serial.println("-- ERROR ENVIANDO EL MENSAJE A TRAVÉS DE LORAWAN --");
   }
 
+  delay(warm_up_time*60*1000);
   sleep_sensors();
   digitalWrite(off_pin, LOW);
   
-  LowPower.sleep(60*15*1000); // LowPower.sleep(60*5*1000);
+  LowPower.sleep((sleep_time - warm_up_time)*60*1000); // LowPower.sleep(60*5*1000);
 }

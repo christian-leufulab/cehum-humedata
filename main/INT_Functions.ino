@@ -53,13 +53,13 @@ void write_to_sd(float data0, float data1,float data2,float data3,float data4,
   dataFile.print(",");
   dataFile.print(data10);
   dataFile.print(",");
-  dataFile.println(data11);
+  dataFile.print(data11);
   dataFile.print(",");
   dataFile.print(data12);
   dataFile.print(",");
-  dataFile.println(data13);
+  dataFile.print(data13);
   dataFile.print(",");
-  dataFile.println(data14);
+  dataFile.print(data14);
   dataFile.print(",");
   dataFile.println(data15);
 
