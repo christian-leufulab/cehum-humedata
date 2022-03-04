@@ -18,7 +18,7 @@
 #include <RTClib.h>
 #include "ArduinoLowPower.h"
 #include "TinyGPS++.h"
-#include "IO_Definitions.h"
+#include "io_definitions.h"
 
 // Unidades de medida
 /*
@@ -167,5 +167,5 @@ void loop() {
 
   sleep_sensors();
   digitalWrite(off_pin, LOW);
-  LowPower.sleep(sleep_time*60*1000); // LowPower.sleep(60*5*1000);
+  LowPower.sleep(sleep_time*60*1000); // 10 minutos * 60*segundos * 1000 milisegundos
 }
