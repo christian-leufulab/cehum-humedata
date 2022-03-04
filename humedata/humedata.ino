@@ -41,8 +41,7 @@
 */
 
 // TIEMPOS DE SLEEP Y DE CALENTAMIENTO (MINUTOS)
-const int sleep_time = 15; 
-const int warm_up_time = 5;
+const int sleep_time = 10; 
 
 void setup() {
   Serial.begin(115200);
@@ -89,7 +88,6 @@ void setup() {
 
 void loop() {
   digitalWrite(off_pin, HIGH);
-
   
   do_wire_transmission();
 
@@ -167,9 +165,7 @@ void loop() {
     Serial.println("-- ERROR ENVIANDO EL MENSAJE A TRAVÉS DE LORAWAN --");
   }
 
-  delay(warm_up_time*60*1000);
   sleep_sensors();
   digitalWrite(off_pin, LOW);
-  
-  LowPower.sleep((sleep_time - warm_up_time)*60*1000); // LowPower.sleep(60*5*1000);
+  LowPower.sleep(sleep_time*60*1000); // LowPower.sleep(60*5*1000);
 }
