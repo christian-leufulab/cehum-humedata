@@ -20,25 +20,64 @@
 #include "TinyGPS++.h"
 #include "io_definitions.h"
 
-// Unidades de medida
+
 /*
-  [0]  --> DISSOLVED OXYGEN          [mg/L]
-  [1]  --> PH                        [-]
-  [2]  --> ELECTRICAL CONDUCTIVITY   [uS/cm]
-  [3]  --> TOTAL DISSOLVED SOLIDS    [ppm]
-  [4]  --> SALINITY                  [ppt]
-  [5]  --> RELATIVE DENSITY          [-]
-  [6]  --> WATER TEMPERATURE         [°C]
-  [7]  --> INTERNAL PRESSURE         [KPa]
-  [8]  --> ATMOSPHERIC PRESSURE      [KPa]
-  [9]  --> ATMOSPHERIC TEMPERATURE   [°C]
-  [10] --> GPS LATITUDE              [°]
-  [11] --> GPS LONGITUDE             [°]
-  [12] --> INTERNAL TEMPERATURE      [°C]
-  [13] --> INTERNAL HUMIDITY         [%]
-  [14] --> BATTERY LEVEL             [V]
-  [15] --> ORP                       [mV]
-*/
+ *           UNIDADES DE MEDIDA
+ *           
+ *[0]  --> DISSOLVED OXYGEN          [mg/L]
+ *[1]  --> PH                        [-]
+ *[2]  --> ELECTRICAL CONDUCTIVITY   [uS/cm]
+ *[3]  --> TOTAL DISSOLVED SOLIDS    [ppm]
+ *[4]  --> SALINITY                  [ppt]
+ *[5]  --> RELATIVE DENSITY          [-]
+ *[6]  --> WATER TEMPERATURE         [°C]
+ *[7]  --> INTERNAL PRESSURE         [KPa]
+ *[8]  --> ATMOSPHERIC PRESSURE      [KPa]
+ *[9]  --> ATMOSPHERIC TEMPERATURE   [°C]
+ *[10] --> GPS LATITUDE              [°]
+ *[11] --> GPS LONGITUDE             [°]
+ *[12] --> INTERNAL TEMPERATURE      [°C]
+ *[13] --> INTERNAL HUMIDITY         [%]
+ *[14] --> BATTERY LEVEL             [V]
+ *[15] --> ORP                       [mV]
+ */
+
+/*        RANGO SENSORES
+ *         
+ * DISSOLVED OXYGEN        --> 0 - 100 [mg/L]     [1 byte]  [O]
+ * pH                      --> 0 - 14             [1 byte]  [O]
+ * ELECTRICAL CONDUCTIVITY --> 0,07 - 500.000     [4 bytes] [ ]
+ * TOTAL DISSOLVED SOLIDS  --> 5 - 500.000        [4 bytes] [ ]
+ * SALINITY                --> 0,00 - 42,00       [1 byte]  [O]
+ * RELATIVE DENSITY        --> 1,00 - 1,300       [1 byte]  [O]
+ * WATER TEMPERATURE       --> 0 - 60             [1 byte]  [O]
+ * INTERNAL PRESSURE       --> 80 - 200           [1 byte]  [O]
+ * ATMOSPHERIC PRESSURE    --> 80 - 120           [1 byte]  [O]
+ * ATMOSPHERIC TEMPERATURE --> -20 - 60           [1 byte]  [O]     
+ * GPS LATITUDE            -->                    [4 bytes] [
+ * GPS LONGITUDE           -->                    [4 bytes] [
+ * INTERNAL TEMPERATURE    --> -20 - 60           [1 byte]  [O]
+ * INTERNAL HUMIDITY       --> 0 - 120            [1 byte]  [O]
+ * BATTERY LEVEL           --> 8 - 13             [1 byte]  [O]
+ * ORP                     --> -2000 - 2000       [4 bytes] [ ]
+ * 
+ * TOTAL:                                         [31 bytes]
+ */
+
+void float2Bytes(float val,byte* bytes_array){
+  // Create union of shared memory space
+  union {
+    float float_variable;
+    byte temp_array[4];
+  } u;
+  // Overite bytes of union with float variable
+  u.float_variable = val;
+  // Assign bytes to input array
+  memcpy(bytes_array, u.temp_array, 4);
+}
+
+
+
 
 // TIEMPOS DE SLEEP Y DE CALENTAMIENTO (MINUTOS)
 const int sleep_time = 10; 
@@ -119,24 +158,56 @@ void loop() {
   Serial.println("]");
 
   write_to_sd(_data[0],_data[1],_data[2],_data[3],_data[4],_data[5],_data[6],_data[7],_data[8],_data[9],_data[10],_data[11], _data[12], _data[13], _data[14], _data[15]);
+
+  float2Bytes(gps_latitude,&gps_latitude_float_bytes[0]);
+  float2Bytes(gps_longitude,&gps_longitude_float_bytes[0]);
+  float2Bytes(_data[2] /*EC*/,&ec_float_bytes[0]);
+  float2Bytes(_data[3] /*TDS*/,&tds_float_bytes[0]);
+  float2Bytes(_data[15] /*ORP*/,&orp_float_bytes[0]);
   
 
-  _data_lorawan[0]  = uint8_t  (_data[0]  * 1);              // Dissolved Oxygen           
-  _data_lorawan[1]  = uint8_t  (_data[1]  * 255/14);         // pH                         
-  _data_lorawan[2]  = uint8_t  (_data[2]  * 1);              // Electrical Conductivity    
-  _data_lorawan[3]  = uint8_t  (_data[3]  * 1);              // Total Dissolved Solids    
-  _data_lorawan[4]  = uint8_t  (_data[4]  * 1);              // Salinity                  
-  _data_lorawan[5]  = uint8_t  (_data[5]  * 1);              // Relative Density         
-  _data_lorawan[6]  = uint8_t  (_data[6]  * 1);              // Water Temperature          
-  _data_lorawan[7]  = uint8_t  (_data[7]  * 1);              // Internal Pressure         
-  _data_lorawan[8]  = uint8_t  (_data[8]  * 1);              // Atmospheric Pressure      
-  _data_lorawan[9]  = uint8_t  (_data[9]  * 1);              // Atmospheric Temperature   
-  _data_lorawan[10] = uint16_t (_data[10] * 1);              // GPS Latitude               
-  _data_lorawan[11] = uint16_t (_data[11] * 1);              // GPS Longitude              
-  _data_lorawan[12] = uint8_t  (_data[12] * 1);              // Internal Temperature      
-  _data_lorawan[13] = uint8_t  (_data[13] * 1);              // Internal Humidity         
-  _data_lorawan[14] = uint8_t  (_data[14] * 1);              // Battery Level              
-  _data_lorawan[15] = uint16_t (_data[15] * 1);              // ORP
+  _data_lorawan[0]  = uint8_t  (_data[0]  * 255/100.0);             // Dissolved Oxygen     
+  _data_lorawan[1]  = uint8_t  (_data[1]  * 255/14.0);              // pH                        
+  _data_lorawan[2]  =   ec_float_bytes[0];                          // Electrical Conductivity
+  _data_lorawan[3]  =   ec_float_bytes[1];                          // Electrical Conductivity
+  _data_lorawan[4]  =   ec_float_bytes[2];                          // Electrical Conductivity
+  _data_lorawan[5]  =   ec_float_bytes[3];                          // Electrical Conductivity
+  _data_lorawan[6]  =   tds_float_bytes[0];                         // Total Dissolved Solids    
+  _data_lorawan[7]  =   tds_float_bytes[1];                         // Total Dissolved Solids    
+  _data_lorawan[8]  =   tds_float_bytes[2];                         // Total Dissolved Solids    
+  _data_lorawan[9]  =   tds_float_bytes[3];                         // Total Dissolved Solids    
+  _data_lorawan[10]  = uint8_t  (_data[4]  * 255/42.0);             // Salinity     
+  _data_lorawan[11]  = uint8_t  ((_data[5] - 1) * 255/0.3);         // Relative Density    
+  _data_lorawan[12]  = uint8_t  (_data[6]  * 255/60.0);             // Water Temperature 
+  _data_lorawan[13]  = uint8_t  ((_data[7] - 80) * 255/120.0);      // Internal Pressure  
+  _data_lorawan[14]  = uint8_t  ((_data[8]  - 80) * 255/40.0);      // Atmospheric Pressure  
+  _data_lorawan[15]  = uint8_t  ((_data[9] + 20) * 255/80.0);       // Atmospheric Temperature   
+  _data_lorawan[16] =   gps_latitude_float_bytes[0];                // GPS Latitude 
+  _data_lorawan[17] =   gps_latitude_float_bytes[1];                // GPS Latitude 
+  _data_lorawan[18] =   gps_latitude_float_bytes[2];                // GPS Latitude 
+  _data_lorawan[19] =   gps_latitude_float_bytes[3];                // GPS Latitude 
+  _data_lorawan[20] =   gps_longitude_float_bytes[0];               // GPS Longitude      
+  _data_lorawan[21] =   gps_longitude_float_bytes[1];               // GPS Longitude  
+  _data_lorawan[22] =   gps_longitude_float_bytes[2];               // GPS Longitude   
+  _data_lorawan[23] =   gps_longitude_float_bytes[3];               // GPS Longitude    
+  _data_lorawan[24] = uint8_t  ((_data[12] + 20) * 255/80.0);       // Internal Temperature
+  _data_lorawan[25] = uint8_t  (_data[13] * 255/120.0);             // Internal Humidity 
+  _data_lorawan[26] = uint8_t  (_data[14] * 1);                     // Battery Level 
+  _data_lorawan[27] =   orp_float_bytes[0];                         // ORP
+  _data_lorawan[28] =   orp_float_bytes[1];                         // ORP
+  _data_lorawan[29] =   orp_float_bytes[2];                         // ORP
+  _data_lorawan[30] =   orp_float_bytes[3];                         // ORP
+
+  Serial.println("LORAWAN HEX DATA: ");
+  
+  for(int a = 0; a < sizeof(_data_lorawan) - 1; a++)
+  {
+    Serial.print("0x");
+    Serial.print(_data_lorawan[a]);
+    Serial.print(" ");
+  }
+
+  Serial.println();
 
   int err;
   modem.beginPacket();

@@ -4,7 +4,7 @@ LoRaModem modem;
 // String devEUI = "A8610A3237277009"; // --> ATLAS 
 String appEui = "70B3D57ED0042E7E";
 String appKey = "5ED7E15D4D31804F8E2A8C447CAE76CC";
-uint8_t _data_lorawan[16];
+uint8_t _data_lorawan[31];
 
 // RTC DS3231
 RTC_DS3231 rtc;
@@ -44,6 +44,7 @@ char orp_data[20];
 byte orp_in_char = 0;
 byte orp_i = 0;
 int orp_time = 815; 
+byte orp_float_bytes[4];
 
 // Sensor de conductividad eléctrica de Atlas Scientific
 const int ec_address = 100;
@@ -56,6 +57,8 @@ char *ec;
 char *tds;
 char *sal;
 char *sg;
+byte tds_float_bytes[4];
+byte ec_float_bytes[4];
 
 // Sensor de oxígeno disuelto de Atlas Scientific
 const int do_address = 97;
@@ -74,7 +77,7 @@ float internal_humidity = 0;
 
 const int sd_cs_pin = 4;
 File dataFile;
-float sd_data[14];
+float sd_data[16];
 
 // Módulo SIM808
 char gps_data[128];
@@ -88,6 +91,8 @@ char *gps_lon;
 
 float gps_latitude = 0;
 float gps_longitude = 0;
+byte gps_latitude_float_bytes[4];
+byte gps_longitude_float_bytes[4];
 
 // Voltaje de la batería
 int batt_level = 0;
