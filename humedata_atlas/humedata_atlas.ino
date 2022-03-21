@@ -80,10 +80,14 @@ void float2Bytes(float val,byte* bytes_array){
 
 
 // TIEMPOS DE SLEEP Y DE CALENTAMIENTO (MINUTOS)
-const int sleep_time = 10; 
+const int sleep_time = 2; 
+
+// GPS Object
+TinyGPSPlus gps;
 
 void setup() {
   Serial.begin(115200);
+  Serial1.begin(9600);
   pinMode(off_pin, OUTPUT);
   digitalWrite(off_pin, LOW);
   
@@ -144,11 +148,12 @@ void loop() {
 
   get_atm_values();
 
-  //get_gps_data();
+  get_gps_data();
 
   read_battery_level();
 
-  Serial.print("DATOS: [");
+  Serial.println("FLOAT DATA:");
+  Serial.print(" [");
   for (int i = 0; i < _data_size ; i++) {
     Serial.print(_data[i]);
     if (i < _data_size -1) {
@@ -200,10 +205,10 @@ void loop() {
 
   Serial.println("LORAWAN HEX DATA: ");
   
-  for(int a = 0; a < sizeof(_data_lorawan) - 1; a++)
+  for(int a = 0; a < sizeof(_data_lorawan); a++)
   {
     Serial.print("0x");
-    Serial.print(_data_lorawan[a]);
+    Serial.print(_data_lorawan[a], HEX);
     Serial.print(" ");
   }
 

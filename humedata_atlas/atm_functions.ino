@@ -21,31 +21,16 @@ void get_atm_values(){
 
 }
 
-void turn_on_gps(){
-  Serial1.println("AT+CGPSPWR=1");
-}
-
 void get_gps_data(){
-  Serial1.println("AT+CGPSINF=0");
-
-  if(Serial1.available() > 0){
-    byte num_chars = Serial1.readBytes(gps_data, 128);
-//    Serial.println(num_chars);
-    gps_data[num_chars] = '\0';
-//    Serial.println(gps_data);
-
-    gps_left_waste = strtok(gps_data, ",");
-    gps_lon = strtok(NULL, ",");
-    gps_lat = strtok(NULL, ",");
-
-    gps_longitude = (float)atof(gps_lon);
-    gps_latitude = (float)atof(gps_lat);
-    
-//    Serial.print("LAT: ");
+  while(Serial1.available() > 0){
+    if(gps.encode(Serial1.read())){
+      gps_longitude = gps.location.lat();
+      gps_latitude = gps.location.lng();
+    }
+  }
 //    Serial.println(gps_longitude);
-    _data[11] = gps_longitude;
+  _data[11] = gps_longitude;
 //    Serial.print("LON: ");
-    _data[10] = gps_latitude;
-//    Serial.println(gps_latitude);
-}
+  _data[10] = gps_latitude;
+
 }
