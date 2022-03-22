@@ -24,8 +24,8 @@ void get_atm_values(){
 void get_gps_data(){
   while(Serial1.available() > 0){
     if(gps.encode(Serial1.read())){
-      gps_longitude = gps.location.lat();
-      gps_latitude = gps.location.lng();
+      gps_latitude = gps.location.lat();
+      gps_longitude = gps.location.lng();
     }
   }
 //    Serial.println(gps_longitude);

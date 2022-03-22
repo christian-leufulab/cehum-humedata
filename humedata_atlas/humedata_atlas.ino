@@ -187,14 +187,14 @@ void loop() {
   _data_lorawan[13]  = uint8_t  ((_data[7] - 80) * 255/120.0);      // Internal Pressure  
   _data_lorawan[14]  = uint8_t  ((_data[8]  - 80) * 255/40.0);      // Atmospheric Pressure  
   _data_lorawan[15]  = uint8_t  ((_data[9] + 20) * 255/80.0);       // Atmospheric Temperature   
-  _data_lorawan[16] =   gps_latitude_float_bytes[0];                // GPS Latitude 
-  _data_lorawan[17] =   gps_latitude_float_bytes[1];                // GPS Latitude 
-  _data_lorawan[18] =   gps_latitude_float_bytes[2];                // GPS Latitude 
-  _data_lorawan[19] =   gps_latitude_float_bytes[3];                // GPS Latitude 
-  _data_lorawan[20] =   gps_longitude_float_bytes[0];               // GPS Longitude      
-  _data_lorawan[21] =   gps_longitude_float_bytes[1];               // GPS Longitude  
-  _data_lorawan[22] =   gps_longitude_float_bytes[2];               // GPS Longitude   
-  _data_lorawan[23] =   gps_longitude_float_bytes[3];               // GPS Longitude    
+  _data_lorawan[16] =   gps_longitude_float_bytes[0];               // GPS Longitude      
+  _data_lorawan[17] =   gps_longitude_float_bytes[1];               // GPS Longitude  
+  _data_lorawan[18] =   gps_longitude_float_bytes[2];               // GPS Longitude   
+  _data_lorawan[19] =   gps_longitude_float_bytes[3];               // GPS Longitude    
+  _data_lorawan[20] =   gps_latitude_float_bytes[0];                // GPS Latitude 
+  _data_lorawan[21] =   gps_latitude_float_bytes[1];                // GPS Latitude 
+  _data_lorawan[22] =   gps_latitude_float_bytes[2];                // GPS Latitude 
+  _data_lorawan[23] =   gps_latitude_float_bytes[3];                // GPS Latitude 
   _data_lorawan[24] = uint8_t  ((_data[12] + 20) * 255/80.0);       // Internal Temperature
   _data_lorawan[25] = uint8_t  (_data[13] * 255/120.0);             // Internal Humidity 
   _data_lorawan[26] = uint8_t  (_data[14] * 1);                     // Battery Level 
@@ -232,6 +232,23 @@ void loop() {
   modem.write(_data_lorawan[13]);
   modem.write(_data_lorawan[14]);
   modem.write(_data_lorawan[15]);
+  modem.write(_data_lorawan[16]);
+  modem.write(_data_lorawan[17]);
+  modem.write(_data_lorawan[18]);
+  modem.write(_data_lorawan[19]);
+  modem.write(_data_lorawan[20]);
+  modem.write(_data_lorawan[21]);
+  modem.write(_data_lorawan[22]);
+  modem.write(_data_lorawan[23]);
+  modem.write(_data_lorawan[24]);
+  modem.write(_data_lorawan[25]);
+  modem.write(_data_lorawan[26]);
+  modem.write(_data_lorawan[27]);
+  modem.write(_data_lorawan[28]);
+  modem.write(_data_lorawan[29]);
+  modem.write(_data_lorawan[30]);
+  
+  
   
   err = modem.endPacket(true);
 
