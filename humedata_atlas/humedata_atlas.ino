@@ -46,20 +46,20 @@
  *         
  * DISSOLVED OXYGEN        --> 0 - 100 [mg/L]     [1 byte]  [O]
  * pH                      --> 0 - 14             [1 byte]  [O]
- * ELECTRICAL CONDUCTIVITY --> 0,07 - 500.000     [4 bytes] [ ]
- * TOTAL DISSOLVED SOLIDS  --> 5 - 500.000        [4 bytes] [ ]
+ * ELECTRICAL CONDUCTIVITY --> 0,07 - 500.000     [4 bytes] [O]
+ * TOTAL DISSOLVED SOLIDS  --> 5 - 500.000        [4 bytes] [O]
  * SALINITY                --> 0,00 - 42,00       [1 byte]  [O]
  * RELATIVE DENSITY        --> 1,00 - 1,300       [1 byte]  [O]
  * WATER TEMPERATURE       --> 0 - 60             [1 byte]  [O]
  * INTERNAL PRESSURE       --> 80 - 200           [1 byte]  [O]
  * ATMOSPHERIC PRESSURE    --> 80 - 120           [1 byte]  [O]
  * ATMOSPHERIC TEMPERATURE --> -20 - 60           [1 byte]  [O]     
- * GPS LATITUDE            -->                    [4 bytes] [
- * GPS LONGITUDE           -->                    [4 bytes] [
+ * GPS LATITUDE            -->                    [4 bytes] [O]
+ * GPS LONGITUDE           -->                    [4 bytes] [O]
  * INTERNAL TEMPERATURE    --> -20 - 60           [1 byte]  [O]
  * INTERNAL HUMIDITY       --> 0 - 120            [1 byte]  [O]
  * BATTERY LEVEL           --> 8 - 13             [1 byte]  [O]
- * ORP                     --> -2000 - 2000       [4 bytes] [ ]
+ * ORP                     --> -2000 - 2000       [4 bytes] [O]
  * 
  * TOTAL:                                         [31 bytes]
  */
@@ -88,8 +88,17 @@ TinyGPSPlus gps;
 void setup() {
   Serial.begin(115200);
   Serial1.begin(9600);
-  pinMode(off_pin, OUTPUT);
-  digitalWrite(off_pin, LOW);
+  pinMode(rtd_off_pin, OUTPUT);
+  pinMode(ph_off_pin, OUTPUT);
+  pinMode(orp_off_pin, OUTPUT);
+  pinMode(ec_off_pin, OUTPUT);
+  pinMode(do_off_pin, OUTPUT);
+  
+  digitalWrite(rtd_off_pin, LOW);
+  digitalWrite(ph_off_pin, LOW);
+  digitalWrite(orp_off_pin, LOW);
+  digitalWrite(ec_off_pin, LOW);
+  digitalWrite(do_off_pin, LOW);
   
   if (!modem.begin(AU915)) {
     Serial.println("-- NO SE HA PODIDO INICIAR EL MÓDULO LORAWAN --");
@@ -130,19 +139,31 @@ void setup() {
 }
 
 void loop() {
-  digitalWrite(off_pin, HIGH);
+  digitalWrite(rtd_off_pin, HIGH);
+  digitalWrite(ph_off_pin, HIGH);
+  digitalWrite(orp_off_pin, HIGH);
+  digitalWrite(ec_off_pin, HIGH);
+  digitalWrite(do_off_pin, HIGH);
   
   do_wire_transmission();
 
+  delay(1000);
+
   ph_wire_transmission();
+
+  delay(1000);
 
   ec_wire_transmission();
 
+  delay(1000);
+
   orp_wire_transmission();
 
-  //get_water_temp();
+  delay(1000);
 
   rtd_wire_transmission();
+
+  delay(1000);
 
   env_pressure();
 
@@ -197,7 +218,7 @@ void loop() {
   _data_lorawan[23] =   gps_latitude_float_bytes[3];                // GPS Latitude 
   _data_lorawan[24] = uint8_t  ((_data[12] + 20) * 255/80.0);       // Internal Temperature
   _data_lorawan[25] = uint8_t  (_data[13] * 255/120.0);             // Internal Humidity 
-  _data_lorawan[26] = uint8_t  (_data[14] * 1);                     // Battery Level 
+  _data_lorawan[26] = uint8_t  ((_data[14] - 536) * 255/168);       // Battery Level 
   _data_lorawan[27] =   orp_float_bytes[0];                         // ORP
   _data_lorawan[28] =   orp_float_bytes[1];                         // ORP
   _data_lorawan[29] =   orp_float_bytes[2];                         // ORP
@@ -259,6 +280,10 @@ void loop() {
   }
 
   sleep_sensors();
-  digitalWrite(off_pin, LOW);
+  digitalWrite(rtd_off_pin, LOW);
+  digitalWrite(ph_off_pin, LOW);
+  digitalWrite(orp_off_pin, LOW);
+  digitalWrite(ec_off_pin, LOW);
+  digitalWrite(do_off_pin, LOW);
   LowPower.sleep(sleep_time*60*1000); // 10 minutos * 60*segundos * 1000 milisegundos
 }

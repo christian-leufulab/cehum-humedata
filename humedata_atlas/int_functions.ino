@@ -16,7 +16,7 @@ void env_pressure(){
 }
 
 void read_battery_level(){
-  batt_level = analogRead(A1) * 0.25;
+  batt_level = analogRead(A1);
   _data[14] = batt_level;
 }
 
