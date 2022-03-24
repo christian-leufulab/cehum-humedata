@@ -1,0 +1,69 @@
+function decodeUplink(input) {
+  
+  function bytesToFloatLongitude(bytes){
+    var bits = input.bytes[19] << 24 | input.bytes[18] << 16 | input.bytes[17] << 8 | input.bytes[16];
+    var sign = (bits>>>31 === 0) ? 1.0 : -1.0;
+    var e = bits>>>23 & 0xff;
+    var m = (e === 0) ? (bits & 0x7fffff)<<1 : (bits & 0x7fffff) | 0x800000;
+    var f = sign * m * Math.pow(2, e - 150);
+    return f;
+  }
+  
+  function bytesToFloatLatitude(bytes){
+    var bits = input.bytes[23] << 24 | input.bytes[22] << 16 | input.bytes[21] << 8 | input.bytes[20];
+    var sign = (bits>>>31 === 0) ? 1.0 : -1.0;
+    var e = bits>>>23 & 0xff;
+    var m = (e === 0) ? (bits & 0x7fffff)<<1 : (bits & 0x7fffff) | 0x800000;
+    var f = sign * m * Math.pow(2, e - 150);
+    return f;
+  }
+  
+  function bytesToFloatORP(bytes){
+    var bits = input.bytes[30] << 24 | input.bytes[29] << 16 | input.bytes[28] << 8 | input.bytes[27];
+    var sign = (bits>>>31 === 0) ? 1.0 : -1.0;
+    var e = bits>>>23 & 0xff;
+    var m = (e === 0) ? (bits & 0x7fffff)<<1 : (bits & 0x7fffff) | 0x800000;
+    var f = sign * m * Math.pow(2, e - 150);
+    return f;
+  }
+  
+  function bytesToFloatEC(bytes){
+    var bits = input.bytes[5] << 24 | input.bytes[4] << 16 | input.bytes[3] << 8 | input.bytes[2];
+    var sign = (bits>>>31 === 0) ? 1.0 : -1.0;
+    var e = bits>>>23 & 0xff;
+    var m = (e === 0) ? (bits & 0x7fffff)<<1 : (bits & 0x7fffff) | 0x800000;
+    var f = sign * m * Math.pow(2, e - 150);
+    return f;
+  }
+  
+  function bytesToFloatTDS(bytes){
+    var bits = input.bytes[9] << 24 | input.bytes[8] << 16 | input.bytes[7] << 8 | input.bytes[6];
+    var sign = (bits>>>31 === 0) ? 1.0 : -1.0;
+    var e = bits>>>23 & 0xff;
+    var m = (e === 0) ? (bits & 0x7fffff)<<1 : (bits & 0x7fffff) | 0x800000;
+    var f = sign * m * Math.pow(2, e - 150);
+    return f;
+  }
+  
+  
+  var data   =  {};
+    data.do  = input.bytes[0] * 100/255;
+    data.ph  = input.bytes[1] * 14/255;
+    data.ec  = bytesToFloatEC(input.bytes.slice(2, 6));
+    data.tds = bytesToFloatTDS(input.bytes.slice(6, 10));
+    data.sal = input.bytes[10] * 42/255;
+    data.rd = (input.bytes[11] * 0.3/255) + 1;
+    data.wt  = input.bytes[12] * 60/255;
+    data.ip  = (input.bytes[13] * 120/255) + 80;
+    data.ap  = (input.bytes[14] * 40/255) + 80;
+    data.at = (input.bytes[15] * 80/255) - 20;
+    data.lat = bytesToFloatLatitude(input.bytes.slice(20, 24));
+    data.lon = bytesToFloatLongitude(input.bytes.slice(16, 20));
+    data.it = (input.bytes[24] * 80/255) - 20;
+    data.ih = input.bytes[25] * 120/255;
+    data.bl = (input.bytes[26] * (100/255));
+    data.orp = bytesToFloatORP(input.bytes.slice(27, 31));
+  return {
+    data: data
+  };
+}
