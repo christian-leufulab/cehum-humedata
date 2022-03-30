@@ -17,7 +17,7 @@ $internal_pressure = 0;
 $lat = 0;
 $long = 0;
 
-$sql = "SELECT atmospheric_pressure, internal_pressure, latitude, longitude FROM logs ORDER BY id DESC LIMIT 1";
+$sql = "SELECT * FROM logs ORDER BY id DESC LIMIT 1";
 
 $result = $conn->query($sql);
 
@@ -30,7 +30,7 @@ if ($result->num_rows > 0) {
     'long' => $result["longitude"]
 
   ];
-  echo json_encode($return);
+  echo json_encode($result);
 } else {
   echo "0 results";
 }

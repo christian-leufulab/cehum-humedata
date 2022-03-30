@@ -64,8 +64,8 @@ let gaugeOptions = {
 
 let chartAtmPressure = Highcharts.chart('container-atm-pressure', Highcharts.merge(gaugeOptions, {
     yAxis: {
-        min: 0,
-        max: 200,
+        min: 80,
+        max: 120,
         title: {
             text: 'Presión Atmosférica'
         }
@@ -95,8 +95,8 @@ let chartAtmPressure = Highcharts.chart('container-atm-pressure', Highcharts.mer
 // The RPM gauge
 let chartRpm = Highcharts.chart('container-rpm', Highcharts.merge(gaugeOptions, {
     yAxis: {
-        min: 0,
-        max: 5,
+        min: 80,
+        max: 120,
         title: {
             text: 'Presión Interna'
         }
@@ -133,7 +133,7 @@ setInterval(function () {
             if (req.status == 200) {
                 // console.log(req.responseText);
                 // console.log(req);
-                // console.log(JSON.parse(req.response));
+                console.log(JSON.parse(req.response));
                 dashboardData = JSON.parse(req.response);
                 point = chartAtmPressure.series[0].points[0];
                 point.update(dashboardData.atm_pressure);
