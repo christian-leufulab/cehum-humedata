@@ -31,6 +31,16 @@ if ($result->num_rows > 0) {
   echo "0 results";
 }
 
+
+$sql = "SELECT * FROM logs ORDER BY id DESC LIMIT 20";
+$queryResult = $conn->query($sql);
+
+// if($result->num_rows >0) {
+//   $result = $result->fetch_assoc();
+// } else {
+//   echo "0 results";
+// }
+
 header('Access-Control-Allow-Origin: *');
 header("Access-Control-Allow-Headers: X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Request-Method");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
@@ -71,8 +81,50 @@ echo '
       <div id="map" style="width: 100%; height: 400px"></div>
     </figure>
 
+
+    <br/>
+    <br/>
+    <br/>
+    
+    <table border="1">
+    <tr>
+    <td>ID</td>
+    <td>Presión atmosférica</td>
+    <td>Temperatura atmosférica</td>
+    <td>Nivel de batería</td>
+    <td>Oxígeno disuelto</td>
+    <td>Conductividad eléctrica</td>
+    <td>Humedad interna</td>
+    <td>Presión Interna</td>
+    <td>Temperatura interna</td>
+    <td>Latitud</td>
+    <td>Longitud</td>
+    <td>Potencial de reducción de oxidación</td>
+    <td>pH</td>
+    <td>Densidad relativa</td>
+    <td>Salinidad</td>
+    <td>Total de sólidos disueltos</td>
+    <td>Temperatura del agua</td>
+    <td>Hora de Registro</td>
+    </tr>
+
+';
+while ($queryRow = $queryResult->fetch_row()) {
+  echo "<tr>";
+  for($i = 0; $i < $queryResult->field_count; $i++){
+      echo "<td>$queryRow[$i]</td>";
+  }
+  echo "</tr>";
+}
+
+echo '    
+</table>
     <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
     <script>
+      setTimeout(function(){
+        window.location.reload(1);
+      }, 60000*5);
+
       let mapOptions = {
         center: [-39.8139, -73.2458],
         zoom: 10,

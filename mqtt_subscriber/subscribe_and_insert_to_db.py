@@ -44,7 +44,10 @@ def on_message(client, userdata, msg):
         print("Guardando en base de datos...OK")
     except:
         db.rollback()
-        print("Guardando en base de datos...Falló")
+	db = MySQLdb.connect("127.0.0.1","root","Learsi.96","mqtt")
+	cursor.execute(sql)
+	db.commit()        
+	print("Guardando en base de datos...Falló")
         
 client = mqtt.Client()
 client.on_connect = on_connect
