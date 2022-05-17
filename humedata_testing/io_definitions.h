@@ -102,11 +102,11 @@ int batt_level = 0;
 float batt_level_float = 0.0;
 
 // Variables generales
-const int rtd_off_pin = 0;
-const int ph_off_pin = 21;
-const int orp_off_pin = 18;
-const int ec_off_pin = 20;
-const int do_off_pin = 19;
+const int rtd_off_pin = 1;
+const int ph_off_pin = 4;
+const int orp_off_pin = 5;
+const int ec_off_pin = 6;
+const int do_off_pin = 7;
 
 const int _data_size = 17;
 float _data[_data_size];

@@ -80,7 +80,7 @@ void float2Bytes(float val,byte* bytes_array){
 
 
 // TIEMPOS DE SLEEP (MINUTOS)
-const int sleep_time = 15; 
+const int sleep_time = 10; 
 
 // GPS Object
 TinyGPSPlus gps;
@@ -326,7 +326,6 @@ void loop() {
   digitalWrite(orp_off_pin, LOW);
   digitalWrite(ec_off_pin, LOW);
   digitalWrite(do_off_pin, LOW);
-  
-  //delay(360*1000);
+  //delay(15*1000);
   LowPower.sleep(sleep_time*60*1000); // 10 minutos * 60*segundos * 1000 milisegundos
 }
