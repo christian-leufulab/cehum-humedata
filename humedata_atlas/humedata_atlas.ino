@@ -12,10 +12,10 @@
 #include <SPI.h>
 #include <SD.h>
 #include <MKRWAN.h>
-#include <OneWire.h>
-#include <DallasTemperature.h>
+//#include <OneWire.h>
+//#include <DallasTemperature.h>
 #include <Adafruit_BMP280.h>
-#include <RTClib.h>
+//#include <RTClib.h>
 #include "ArduinoLowPower.h"
 #include "TinyGPS++.h"
 #include "io_definitions.h"
@@ -179,6 +179,13 @@ void loop() {
 
   read_battery_level();
 
+  sleep_sensors();
+  digitalWrite(rtd_off_pin, LOW);
+  digitalWrite(ph_off_pin, LOW);
+  digitalWrite(orp_off_pin, LOW);
+  digitalWrite(ec_off_pin, LOW);
+  digitalWrite(do_off_pin, LOW);
+
   Serial.println("FLOAT DATA:");
   Serial.print(" [");
   for (int i = 0; i < _data_size ; i++) {
@@ -320,12 +327,7 @@ void loop() {
     Serial.println("-- ERROR ENVIANDO EL MENSAJE A TRAVÉS DE LORAWAN --");
   }
 
-  sleep_sensors();
-  digitalWrite(rtd_off_pin, LOW);
-  digitalWrite(ph_off_pin, LOW);
-  digitalWrite(orp_off_pin, LOW);
-  digitalWrite(ec_off_pin, LOW);
-  digitalWrite(do_off_pin, LOW);
+  
   
   //delay(360*1000);
   LowPower.sleep(sleep_time*60*1000); // 10 minutos * 60*segundos * 1000 milisegundos

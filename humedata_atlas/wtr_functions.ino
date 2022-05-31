@@ -140,6 +140,7 @@ void orp_wire_transmission(){
   _data[15] = (float)atof(orp_data);
 }
 
+/*
 void get_water_temp(){
   sensors.begin();
   sensors.requestTemperatures();
@@ -149,3 +150,4 @@ void get_water_temp(){
 //  Serial.print(water_temperature);
 //  Serial.println("°C --");
   }
+*/

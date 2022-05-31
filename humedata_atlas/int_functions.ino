@@ -70,6 +70,7 @@ void write_to_sd(float data0, float data1,float data2,float data3,float data4,
   SPI.end();
 }
 
+/*
 void get_time(){
   rtc.begin();
   DateTime now = rtc.now();
@@ -88,6 +89,7 @@ void get_time(){
   Serial.println(" ");
   delay(1000);
 }
+*/
 
 void sleep_sensors(){
   Wire.begin();

@@ -7,7 +7,7 @@ String appKey = "5ED7E15D4D31804F8E2A8C447CAE76CC";
 uint8_t _data_lorawan[34];
 
 // RTC DS3231
-RTC_DS3231 rtc;
+//RTC_DS3231 rtc;
 
 // Sensor de presión y temperatura BMP280
 Adafruit_BMP280 bmp;
@@ -16,8 +16,8 @@ float atm_temperature;
 
 // Sensor de temperatura DS18B20
 const int water_temp_pin = 3;
-OneWire oneWire(water_temp_pin);
-DallasTemperature sensors(&oneWire);
+//OneWire oneWire(water_temp_pin);
+//DallasTemperature sensors(&oneWire);
 float water_temperature;
 
 // Sensor de temperatura RTD de Atlas Scientific
