@@ -1,5 +1,5 @@
 /*
-   TITLE: CEHUM - HUMEDAT@ ATLAS
+   TITLE: CEHUM - HUMEDAT@ XI'AN
    AUTHOR: CHRISTIAN SANTIBÁÑEZ SOTO
    COMPANY: LEUFÜLAB
    DATE: 12/01/2022
@@ -19,12 +19,6 @@
 #include "ArduinoLowPower.h"
 #include "TinyGPS++.h"
 #include "io_definitions.h"
-#include "wtr_functions.h"
-#include "int_functions.h"
-#include "atm_functions.h"
-
-// TIEMPOS DE SLEEP (MINUTOS)
-const int sleep_time = 10; 
 
 
 /*
@@ -37,8 +31,8 @@ const int sleep_time = 10;
  *[4]  --> SALINITY                  [ppt]
  *[5]  --> RELATIVE DENSITY          [-]
  *[6]  --> WATER TEMPERATURE         [°C]
- *[7]  --> INTERNAL PRESSURE         [KPa]
- *[8]  --> ATMOSPHERIC PRESSURE      [KPa]
+ *[7]  --> INTERNAL PRESSURE         [kPa]
+ *[8]  --> ATMOSPHERIC PRESSURE      [kPa]
  *[9]  --> ATMOSPHERIC TEMPERATURE   [°C]
  *[10] --> GPS LATITUDE              [°]
  *[11] --> GPS LONGITUDE             [°]
@@ -70,14 +64,30 @@ const int sleep_time = 10;
  * TOTAL:                                         [31 bytes]
  */
 
+void float2Bytes(float val,byte* bytes_array){
+  // Create union of shared memory space
+  union {
+    float float_variable;
+    byte temp_array[4];
+  } u;
+  // Overite bytes of union with float variable
+  u.float_variable = val;
+  // Assign bytes to input array
+  memcpy(bytes_array, u.temp_array, 4);
+}
+
+
+
+
+// TIEMPOS DE SLEEP (MINUTOS)
+const int sleep_time = 15; 
+
+// GPS Object
+TinyGPSPlus gps;
 
 void setup() {
   Serial.begin(115200);
   Serial1.begin(9600);
-  Wire.begin();
-  SPI.begin();
-
-  
   pinMode(rtd_off_pin, OUTPUT);
   pinMode(ph_off_pin, OUTPUT);
   pinMode(orp_off_pin, OUTPUT);
@@ -113,7 +123,15 @@ void setup() {
   Serial.println(" --");
 
    modem.minPollInterval(300);
+
+  Serial1.begin(9600);
+
+//  delay(10000);
+//  turn_on_gps();
+
+  Wire.begin();
   
+  SPI.begin();
   delay(100);
   SD.begin(sd_cs_pin);
   dataFile = SD.open("log-0000.csv", FILE_WRITE);
@@ -309,5 +327,6 @@ void loop() {
   digitalWrite(ec_off_pin, LOW);
   digitalWrite(do_off_pin, LOW);
   
+  //delay(360*1000);
   LowPower.sleep(sleep_time*60*1000); // 10 minutos * 60*segundos * 1000 milisegundos
 }
