@@ -309,5 +309,5 @@ void loop() {
   digitalWrite(ec_off_pin, LOW);
   digitalWrite(do_off_pin, LOW);
   
-  LowPower.sleep(sleep_time*60*1000); // 10 minutos * 60*segundos * 1000 milisegundos
+  delay(3*60*1000); // 10 minutos * 60*segundos * 1000 milisegundos
 }

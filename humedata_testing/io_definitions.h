@@ -2,8 +2,9 @@
 LoRaModem modem;
 // String devEUI = "A8610A3233298409"; // --> ALPHA 
 // String devEUI = "A8610A3237277009"; // --> ATLAS 
-String appEui = "70B3D57ED0042E7E";
-String appKey = "5ED7E15D4D31804F8E2A8C447CAE76CC";
+String devEUI = "A8610A32371B6E09"; // --> BP 
+String appEui = "A8610A3237267209";
+String appKey = "EF09882529BA1054A2062ACDFBDB30EC";
 uint8_t _data_lorawan[34];
 
 // RTC DS3231
