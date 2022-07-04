@@ -5,20 +5,11 @@ void get_atm_values(){
   Adafruit_BMP280::SAMPLING_X16,                    /* Pressure oversampling */
   Adafruit_BMP280::FILTER_X16,                      /* Filtering. */
   Adafruit_BMP280::STANDBY_MS_500);                 /* Standby time. */
-  atm_pressure = bmp.readPressure()/1000;
+  atm_pressure = bmp.readPressure()/100;
   atm_temperature = bmp.readTemperature();
   
-//  Serial.print("-- EXTERNAL PRESSURE: ");
-  _data[8] = atm_pressure;
-//  Serial.print(atm_pressure);
-//  Serial.println(" KPA --");
-  
-  
-//  Serial.print("-- EXTERNAL TEMPERATURE: ");
+  _data[8] = atm_pressure;  
   _data[9] = atm_temperature;
-//  Serial.print(atm_temperature);
-//  Serial.println(" °C --");
-
 }
 
 void get_gps_data(){
@@ -28,9 +19,6 @@ void get_gps_data(){
       gps_longitude = gps.location.lng();
     }
   }
-//    Serial.println(gps_longitude);
   _data[11] = gps_longitude;
-//    Serial.print("LON: ");
   _data[10] = gps_latitude;
-
 }

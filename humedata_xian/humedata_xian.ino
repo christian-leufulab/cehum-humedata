@@ -12,14 +12,15 @@
 #include <SPI.h>
 #include <SD.h>
 #include <MKRWAN.h>
-#include <OneWire.h>
-#include <DallasTemperature.h>
 #include <Adafruit_BMP280.h>
 #include <RTClib.h>
 #include "ArduinoLowPower.h"
 #include "TinyGPS++.h"
-#include "io_definitions.h"
-
+#include "io.h"
+#include "vars.h"
+#include "wtr.h"
+#include "atm.h"
+#include "int.h"
 
 /*
  *           UNIDADES DE MEDIDA
@@ -31,8 +32,8 @@
  *[4]  --> SALINITY                  [ppt]
  *[5]  --> RELATIVE DENSITY          [-]
  *[6]  --> WATER TEMPERATURE         [°C]
- *[7]  --> INTERNAL PRESSURE         [kPa]
- *[8]  --> ATMOSPHERIC PRESSURE      [kPa]
+ *[7]  --> INTERNAL PRESSURE         [hPa]
+ *[8]  --> ATMOSPHERIC PRESSURE      [hPa]
  *[9]  --> ATMOSPHERIC TEMPERATURE   [°C]
  *[10] --> GPS LATITUDE              [°]
  *[11] --> GPS LONGITUDE             [°]
@@ -76,29 +77,9 @@ void float2Bytes(float val,byte* bytes_array){
   memcpy(bytes_array, u.temp_array, 4);
 }
 
-
-
-
-// TIEMPOS DE SLEEP (MINUTOS)
-const int sleep_time = 15; 
-
-// GPS Object
-TinyGPSPlus gps;
-
 void setup() {
   Serial.begin(115200);
   Serial1.begin(9600);
-  pinMode(rtd_off_pin, OUTPUT);
-  pinMode(ph_off_pin, OUTPUT);
-  pinMode(orp_off_pin, OUTPUT);
-  pinMode(ec_off_pin, OUTPUT);
-  pinMode(do_off_pin, OUTPUT);
-  
-  digitalWrite(rtd_off_pin, LOW);
-  digitalWrite(ph_off_pin, LOW);
-  digitalWrite(orp_off_pin, LOW);
-  digitalWrite(ec_off_pin, LOW);
-  digitalWrite(do_off_pin, LOW);
 
   delay(1000);
   
@@ -122,12 +103,9 @@ void setup() {
   Serial.print(connected);
   Serial.println(" --");
 
-   modem.minPollInterval(300);
+  modem.minPollInterval(300);
 
   Serial1.begin(9600);
-
-//  delay(10000);
-//  turn_on_gps();
 
   Wire.begin();
   
@@ -143,34 +121,6 @@ void setup() {
 }
 
 void loop() {
-  digitalWrite(rtd_off_pin, HIGH);
-  digitalWrite(ph_off_pin, HIGH);
-  digitalWrite(orp_off_pin, HIGH);
-  digitalWrite(ec_off_pin, HIGH);
-  digitalWrite(do_off_pin, HIGH);
-
-  delay(1500);
-  
-  do_wire_transmission();
-
-  delay(1000);
-
-  ph_wire_transmission();
-
-  delay(1000);
-
-  ec_wire_transmission();
-
-  delay(1000);
-
-  orp_wire_transmission();
-
-  delay(1000);
-
-  rtd_wire_transmission();
-
-  delay(1000);
-
   env_pressure();
 
   get_atm_values();
@@ -193,67 +143,7 @@ void loop() {
 
   float2Bytes(gps_latitude,&gps_latitude_float_bytes[0]);
   float2Bytes(gps_longitude,&gps_longitude_float_bytes[0]);
-  float2Bytes(_data[2] /*EC*/,&ec_float_bytes[0]);
-  float2Bytes(_data[3] /*TDS*/,&tds_float_bytes[0]);
-  float2Bytes(_data[15] /*ORP*/,&orp_float_bytes[0]);
-  float2Bytes(_data[0] /*DO*/,&do_float_bytes[0]);
-  //float2Bytes(_data[16] /*SAT*/,&sat_float_bytes[0]);
   
-
-  _data_lorawan[0]  = do_float_bytes[0];                            // DO 
-  _data_lorawan[1]  = do_float_bytes[1];                            // DO 
-  _data_lorawan[2]  = do_float_bytes[2];                            // DO 
-  _data_lorawan[3]  = do_float_bytes[3];                            // DO 
-    
-  _data_lorawan[4]  = uint8_t  (_data[1]  * 255/14.0);              // pH   
-                       
-  _data_lorawan[5]  =   ec_float_bytes[0];                          // Electrical Conductivity
-  _data_lorawan[6]  =   ec_float_bytes[1];                          // Electrical Conductivity
-  _data_lorawan[7]  =   ec_float_bytes[2];                          // Electrical Conductivity
-  _data_lorawan[8]  =   ec_float_bytes[3];                          // Electrical Conductivity
-  
-  _data_lorawan[9]   =   tds_float_bytes[0];                         // Total Dissolved Solids    
-  _data_lorawan[10]  =   tds_float_bytes[1];                        // Total Dissolved Solids    
-  _data_lorawan[11]  =   tds_float_bytes[2];                        // Total Dissolved Solids    
-  _data_lorawan[12]  =   tds_float_bytes[3];                        // Total Dissolved Solids   
-   
-  _data_lorawan[13]  = uint8_t  (_data[4]  * 255/42.0);             // Salinity  
-     
-  _data_lorawan[14]  = uint8_t  ((_data[5] - 1) * 255/0.3);         // Relative Density   
-   
-  _data_lorawan[15]  = uint8_t  (_data[6]  * 255/60.0);             // Water Temperature 
-  
-  _data_lorawan[16]  = uint8_t  ((_data[7] - 80) * 255/120.0);      // Internal Pressure
-    
-  _data_lorawan[17]  = uint8_t  ((_data[8]  - 80) * 255/40.0);      // Atmospheric Pressure 
-   
-  _data_lorawan[18]  = uint8_t  ((_data[9] + 20) * 255/80.0);       // Atmospheric Temperature   
-  
-  _data_lorawan[19] =   gps_longitude_float_bytes[0];               // GPS Longitude      
-  _data_lorawan[20] =   gps_longitude_float_bytes[1];               // GPS Longitude  
-  _data_lorawan[21] =   gps_longitude_float_bytes[2];               // GPS Longitude   
-  _data_lorawan[22] =   gps_longitude_float_bytes[3];               // GPS Longitude   
-   
-  _data_lorawan[23] =   gps_latitude_float_bytes[0];                // GPS Latitude 
-  _data_lorawan[24] =   gps_latitude_float_bytes[1];                // GPS Latitude 
-  _data_lorawan[25] =   gps_latitude_float_bytes[2];                // GPS Latitude 
-  _data_lorawan[26] =   gps_latitude_float_bytes[3];                // GPS Latitude 
-  
-  _data_lorawan[27] = uint8_t  ((_data[12] + 20) * 255/80.0);       // Internal Temperature
-  
-  _data_lorawan[28] = uint8_t  (_data[13] * 255/120.0);             // Internal Humidity 
-  
-  _data_lorawan[29] = uint8_t  ((_data[14] - 536) * 255/168);       // Battery Level 
-  
-  _data_lorawan[30] =   orp_float_bytes[0];                         // ORP
-  _data_lorawan[31] =   orp_float_bytes[1];                         // ORP
-  _data_lorawan[32] =   orp_float_bytes[2];                         // ORP
-  _data_lorawan[33] =   orp_float_bytes[3];                         // ORP
-  
-//  _data_lorawan[34] =   sat_float_bytes[0];                         // SAT
-//  _data_lorawan[35] =   sat_float_bytes[1];                         // SAT
-//  _data_lorawan[36] =   sat_float_bytes[2];                         // SAT
-//  _data_lorawan[37] =   sat_float_bytes[3];                         // SAT
 
   Serial.println("LORAWAN HEX DATA: ");
   
@@ -302,15 +192,6 @@ void loop() {
   modem.write(_data_lorawan[31]);
   modem.write(_data_lorawan[32]);
   modem.write(_data_lorawan[33]);
-
-  
-//  modem.write(_data_lorawan[34]);
-//  modem.write(_data_lorawan[35]);
-//  modem.write(_data_lorawan[36]);
-//  modem.write(_data_lorawan[37]);
-  
-  
-  
   
   err = modem.endPacket(true);
 
@@ -320,13 +201,6 @@ void loop() {
     Serial.println("-- ERROR ENVIANDO EL MENSAJE A TRAVÉS DE LORAWAN --");
   }
 
-  sleep_sensors();
-  digitalWrite(rtd_off_pin, LOW);
-  digitalWrite(ph_off_pin, LOW);
-  digitalWrite(orp_off_pin, LOW);
-  digitalWrite(ec_off_pin, LOW);
-  digitalWrite(do_off_pin, LOW);
-  
-  //delay(360*1000);
-  LowPower.sleep(sleep_time*60*1000); // 10 minutos * 60*segundos * 1000 milisegundos
+  delay(3*60*1000);
+  //LowPower.sleep(sleep_time*60*1000); // 10 minutos * 60*segundos * 1000 milisegundos
 }
