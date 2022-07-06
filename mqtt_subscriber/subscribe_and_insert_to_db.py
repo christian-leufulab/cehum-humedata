@@ -8,7 +8,7 @@ import json
 
 # Abrir conexión con bases de datos
 try:
-    db = MySQLdb.connect("127.0.0.1","root","Learsi.96","mqtt")
+    db = MySQLdb.connect("127.0.0.1","root","ittfly97","mqtt")
 except:
     print("No se pudo conectar con la base de datos")
     print("Cerrando...")
@@ -30,12 +30,15 @@ def on_message(client, userdata, msg):
 #    print(msg.topic+" "+str(msg.payload))
 #    print(msg.topic)
     response = json.loads(msg.payload.decode("utf-8"))
+    dev_eui = response['end_device_ids']['dev_eui']
     response = response['uplink_message']['decoded_payload']
     print(response)
     lista = msg.topic.split("/")
+    
+    #query =  SELECT id FROM Humedata_devices WHERE dev_eui=dev_eui(variable);
 
     #sql = """INSERT INTO `mqtt`.`logs` (`ap`, `at`, `bl`, `do`, `ec`, `ih`, `ip`, `it`, `lat`, `long`, `orp`, `ph`, `rd`, `sal`, `tds`, `wt`) VALUES (""" + response['ap'] + """, """ + response['at'] + """, """ + response['bl'] + """, """ + response['do'] + """, """ + response['ec'] + """, """ + response['ih'] + """, """ + response['ip'] + """, """ + response['it'] + """, """ + response['lat'] + """, """ + response['lon'] + """, """ + response['orp'] + """, """ + response['ph'] + """, """ + response['rd'] + """, """ + response['sal'] + """, """ + response['tds'] + """, """ + response['wt'] + """);"""
-    sql = """INSERT INTO `mqtt`.`logs` (`atmospheric_pressure`, `atmospheric_temperature`, `battery_level`, `dissolved_oxygen`, `electrical_conductivity`, `internal_humidity`, `internal_pressure`, `internal_temperature`, `latitude`, `longitude`, `oxide_reduction_potential`, `ph`, `relative_density`, `salinity`, `total_dissolved_solids`, `water_temperature`) VALUES (""" + str(response['ap']) + """, """ + str(response['at']) + """, """ + str(response['bl']) + """, """ + str(response['do']) + """, """ + str(response['ec']) + """, """ + str(response['ih']) + """, """ + str(response['ip']) + """, """ + str(response['it']) + """, """ + str(response['lat']) + """, """ + str(response['lon']) + """, """ + str(response['orp']) + """, """ + str(response['ph']) + """, """ + str(response['rd']) + """, """ + str(response['sal']) + """, """ + str(response['tds']) + """, """ + str(response['wt']) + """);"""
+    sql = """INSERT INTO `mqtt`.`logs` (`atmospheric_pressure`, `atmospheric_temperature`, `battery_level`, `dissolved_oxygen`, `electrical_conductivity`, `internal_humidity`, `internal_pressure`, `internal_temperature`, `latitude`, `longitude`, `oxide_reduction_potential`, `ph`, `relative_density`, `salinity`, `total_dissolved_solids`, `water_temperature`, `dev_id`) VALUES (""" + str(response['ap']) + """, """ + str(response['at']) + """, """ + str(response['bl']) + """, """ + str(response['do']) + """, """ + str(response['ec']) + """, """ + str(response['ih']) + """, """ + str(response['ip']) + """, """ + str(response['it']) + """, """ + str(response['lat']) + """, """ + str(response['lon']) + """, """ + str(response['orp']) + """, """ + str(response['ph']) + """, """ + str(response['rd']) + """, """ + str(response['sal']) + """, """ + str(response['tds']) + """, """ + str(response['wt']) + """, """ + str(1) + """);"""
 
     try:
         # Ejecutar un comando SQL
