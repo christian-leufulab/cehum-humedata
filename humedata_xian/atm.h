@@ -5,7 +5,7 @@ void get_atm_values(){
   Adafruit_BMP280::SAMPLING_X16,                    /* Pressure oversampling */
   Adafruit_BMP280::FILTER_X16,                      /* Filtering. */
   Adafruit_BMP280::STANDBY_MS_500);                 /* Standby time. */
-  atm_pressure = bmp.readPressure()/100;
+  atm_pressure = bmp.readPressure()/1000;
   atm_temperature = bmp.readTemperature();
   
   _data[8] = atm_pressure;  
@@ -21,4 +21,5 @@ void get_gps_data(){
   }
   _data[11] = gps_longitude;
   _data[10] = gps_latitude;
+  digitalWrite(gps_switch, LOW);
 }
