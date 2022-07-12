@@ -17,6 +17,9 @@ except:
 # Preparando cursor
 cursor = db.cursor()
 
+# Diccionario de dispositos (temporal)
+dev_euis = {'A8610A3237277009':1,'A8610A32371B6E09':2,'A8610A3237267209':3}
+
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, rc):
     print("Conectado - Codigo de resultado: "+str(rc))
@@ -33,12 +36,14 @@ def on_message(client, userdata, msg):
     dev_eui = response['end_device_ids']['dev_eui']
     response = response['uplink_message']['decoded_payload']
     print(response)
+    print(dev_eui)
     lista = msg.topic.split("/")
     
+    #check_and_create_device(dev_eui)
     #query =  SELECT id FROM Humedata_devices WHERE dev_eui=dev_eui(variable);
 
     #sql = """INSERT INTO `mqtt`.`logs` (`ap`, `at`, `bl`, `do`, `ec`, `ih`, `ip`, `it`, `lat`, `long`, `orp`, `ph`, `rd`, `sal`, `tds`, `wt`) VALUES (""" + response['ap'] + """, """ + response['at'] + """, """ + response['bl'] + """, """ + response['do'] + """, """ + response['ec'] + """, """ + response['ih'] + """, """ + response['ip'] + """, """ + response['it'] + """, """ + response['lat'] + """, """ + response['lon'] + """, """ + response['orp'] + """, """ + response['ph'] + """, """ + response['rd'] + """, """ + response['sal'] + """, """ + response['tds'] + """, """ + response['wt'] + """);"""
-    sql = """INSERT INTO `mqtt`.`logs` (`atmospheric_pressure`, `atmospheric_temperature`, `battery_level`, `dissolved_oxygen`, `electrical_conductivity`, `internal_humidity`, `internal_pressure`, `internal_temperature`, `latitude`, `longitude`, `oxide_reduction_potential`, `ph`, `relative_density`, `salinity`, `total_dissolved_solids`, `water_temperature`, `dev_id`) VALUES (""" + str(response['ap']) + """, """ + str(response['at']) + """, """ + str(response['bl']) + """, """ + str(response['do']) + """, """ + str(response['ec']) + """, """ + str(response['ih']) + """, """ + str(response['ip']) + """, """ + str(response['it']) + """, """ + str(response['lat']) + """, """ + str(response['lon']) + """, """ + str(response['orp']) + """, """ + str(response['ph']) + """, """ + str(response['rd']) + """, """ + str(response['sal']) + """, """ + str(response['tds']) + """, """ + str(response['wt']) + """, """ + str(1) + """);"""
+    sql = """INSERT INTO `mqtt`.`logs` (`atmospheric_pressure`, `atmospheric_temperature`, `battery_level`, `dissolved_oxygen`, `electrical_conductivity`, `internal_humidity`, `internal_pressure`, `internal_temperature`, `latitude`, `longitude`, `oxide_reduction_potential`, `ph`, `relative_density`, `salinity`, `total_dissolved_solids`, `water_temperature`, `dev_id`) VALUES (""" + str(response['ap']) + """, """ + str(response['at']) + """, """ + str(response['bl']) + """, """ + str(response['do']) + """, """ + str(response['ec']) + """, """ + str(response['ih']) + """, """ + str(response['ip']) + """, """ + str(response['it']) + """, """ + str(response['lat']) + """, """ + str(response['lon']) + """, """ + str(response['orp']) + """, """ + str(response['ph']) + """, """ + str(response['rd']) + """, """ + str(response['sal']) + """, """ + str(response['tds']) + """, """ + str(response['wt']) + """, """ + str(dev_euis[dev_eui]) + """);"""
 
     try:
         # Ejecutar un comando SQL
@@ -48,7 +53,23 @@ def on_message(client, userdata, msg):
     except:
         db.rollback()
         print("Guardando en base de datos...Falló")
-        
+
+def check_and_create_device(ndev_eui):
+    try:
+        a = 0
+        #new_cursor = db.cursor()
+        #new_cursor.execute( SELECT id, dev_eui COUNT (*) FROM Humedata_devices WHERE dev_eui = %s, (ndev_eui,))
+        #row_count = new_cursor.rowcount
+        #if row count == 0;
+            #print("Nuevo dispositivo encontrado, agregando a la base de datos...")
+            #new_cursor.execute(INSERT INTO Humedata_devices (device_name, dev_eui) VALUES (%s, %s), (ndev_eui))
+        #db.commit()
+    except:
+        print("Error")
+        #db.rollback()
+        #print("Error")
+    return 0
+
 client = mqtt.Client()
 client.on_connect = on_connect
 client.on_message = on_message
