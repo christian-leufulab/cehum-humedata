@@ -8,7 +8,7 @@ import json
 
 # Abrir conexión con bases de datos
 try:
-    db = MySQLdb.connect("127.0.0.1","root","ittfly97","mqtt")
+    db = MySQLdb.connect("127.0.0.1","root","Ittfly97?","mqtt")
 except:
     print("No se pudo conectar con la base de datos")
     print("Cerrando...")
