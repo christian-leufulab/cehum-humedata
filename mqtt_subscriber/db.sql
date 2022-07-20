@@ -43,6 +43,7 @@ CREATE TABLE `logs` (
   `total_dissolved_solids` float DEFAULT NULL,
   `water_temperature` float DEFAULT NULL,
   `timestamp` datetime DEFAULT CURRENT_TIMESTAMP,
+  `dev_id` int(11)NOT NULL DEFAULT 1, 
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;

@@ -1,14 +1,28 @@
-#!/usr/bin/env python 1
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import sys
 import paho.mqtt.client as mqtt
 import sys
 import MySQLdb
 import json
 
-# Abrir conexión con bases de datos
+
+#Check arguments
+if len(sys.argv) != 2:
+    print(f'USO: {sys.argv[0]} <humedata-xxxx>, posibles opciones: atlas,bp,xian')
+    sys.exit()
+
+#Posibles valores: humedata-atlas -- humedata-bp --humedata-xian    
+boya = sys.argv[1]
+
+# Abrir conexión con bases de datos, cambiar valores de db segun corresponda
 try:
-    db = MySQLdb.connect("127.0.0.1","root","Ittfly97?","mqtt")
+    f = open("log_in", 'r')
+    line = f.readline()
+    db_inf = line.strip().split(',')
+    f.close()
+    db = MySQLdb.connect(db_inf[0],db_inf[1],db_inf[2],db_inf[3])
 except:
     print("No se pudo conectar con la base de datos")
     print("Cerrando...")
@@ -16,9 +30,7 @@ except:
 
 # Preparando cursor
 cursor = db.cursor()
-
-# Diccionario de dispositos (temporal)
-dev_euis = {'A8610A3237277009':1,'A8610A32371B6E09':2,'A8610A3237267209':3}
+cursor2 = db.cursor()   
 
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, rc):
@@ -26,7 +38,7 @@ def on_connect(client, userdata, flags, rc):
 
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
-    client.subscribe("v3/cehum-humedata@ttn/devices/humedata-atlas/up")
+    client.subscribe("v3/cehum-humedata@ttn/devices/{}/up".format(boya))
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
@@ -38,12 +50,15 @@ def on_message(client, userdata, msg):
     print(response)
     print(dev_eui)
     lista = msg.topic.split("/")
-    
-    #check_and_create_device(dev_eui)
-    #query =  SELECT id FROM Humedata_devices WHERE dev_eui=dev_eui(variable);
 
     #sql = """INSERT INTO `mqtt`.`logs` (`ap`, `at`, `bl`, `do`, `ec`, `ih`, `ip`, `it`, `lat`, `long`, `orp`, `ph`, `rd`, `sal`, `tds`, `wt`) VALUES (""" + response['ap'] + """, """ + response['at'] + """, """ + response['bl'] + """, """ + response['do'] + """, """ + response['ec'] + """, """ + response['ih'] + """, """ + response['ip'] + """, """ + response['it'] + """, """ + response['lat'] + """, """ + response['lon'] + """, """ + response['orp'] + """, """ + response['ph'] + """, """ + response['rd'] + """, """ + response['sal'] + """, """ + response['tds'] + """, """ + response['wt'] + """);"""
-    sql = """INSERT INTO `mqtt`.`logs` (`atmospheric_pressure`, `atmospheric_temperature`, `battery_level`, `dissolved_oxygen`, `electrical_conductivity`, `internal_humidity`, `internal_pressure`, `internal_temperature`, `latitude`, `longitude`, `oxide_reduction_potential`, `ph`, `relative_density`, `salinity`, `total_dissolved_solids`, `water_temperature`, `dev_id`) VALUES (""" + str(response['ap']) + """, """ + str(response['at']) + """, """ + str(response['bl']) + """, """ + str(response['do']) + """, """ + str(response['ec']) + """, """ + str(response['ih']) + """, """ + str(response['ip']) + """, """ + str(response['it']) + """, """ + str(response['lat']) + """, """ + str(response['lon']) + """, """ + str(response['orp']) + """, """ + str(response['ph']) + """, """ + str(response['rd']) + """, """ + str(response['sal']) + """, """ + str(response['tds']) + """, """ + str(response['wt']) + """, """ + str(dev_euis[dev_eui]) + """);"""
+    query = """SELECT id FROM Humedata_devices WHERE dev_eui = %s"""
+    cursor2.execute(query, (dev_eui,))
+    data2 = cursor2.fetchone()
+    data3 = data2[0]
+    
+    
+    sql = """INSERT INTO `mqtt`.`logs` (`atmospheric_pressure`, `atmospheric_temperature`, `battery_level`, `dissolved_oxygen`, `electrical_conductivity`, `internal_humidity`, `internal_pressure`, `internal_temperature`, `latitude`, `longitude`, `oxide_reduction_potential`, `ph`, `relative_density`, `salinity`, `total_dissolved_solids`, `water_temperature`, `dev_id`) VALUES (""" + str(response['ap']) + """, """ + str(response['at']) + """, """ + str(response['bl']) + """, """ + str(response['do']) + """, """ + str(response['ec']) + """, """ + str(response['ih']) + """, """ + str(response['ip']) + """, """ + str(response['it']) + """, """ + str(response['lat']) + """, """ + str(response['lon']) + """, """ + str(response['orp']) + """, """ + str(response['ph']) + """, """ + str(response['rd']) + """, """ + str(response['sal']) + """, """ + str(response['tds']) + """, """ + str(response['wt']) + """, """ + str(data3) + """);"""
 
     try:
         # Ejecutar un comando SQL
@@ -53,22 +68,6 @@ def on_message(client, userdata, msg):
     except:
         db.rollback()
         print("Guardando en base de datos...Falló")
-
-def check_and_create_device(ndev_eui):
-    try:
-        a = 0
-        #new_cursor = db.cursor()
-        #new_cursor.execute( SELECT id, dev_eui COUNT (*) FROM Humedata_devices WHERE dev_eui = %s, (ndev_eui,))
-        #row_count = new_cursor.rowcount
-        #if row count == 0;
-            #print("Nuevo dispositivo encontrado, agregando a la base de datos...")
-            #new_cursor.execute(INSERT INTO Humedata_devices (device_name, dev_eui) VALUES (%s, %s), (ndev_eui))
-        #db.commit()
-    except:
-        print("Error")
-        #db.rollback()
-        #print("Error")
-    return 0
 
 client = mqtt.Client()
 client.on_connect = on_connect
