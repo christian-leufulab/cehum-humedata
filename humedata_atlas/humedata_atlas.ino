@@ -76,11 +76,8 @@ void float2Bytes(float val,byte* bytes_array){
   memcpy(bytes_array, u.temp_array, 4);
 }
 
-
-
-
 // TIEMPOS DE SLEEP (MINUTOS)
-const int sleep_time = 15; 
+const int sleep_time = 5;
 
 // GPS Object
 TinyGPSPlus gps;
