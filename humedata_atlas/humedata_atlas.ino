@@ -76,11 +76,8 @@ void float2Bytes(float val,byte* bytes_array){
   memcpy(bytes_array, u.temp_array, 4);
 }
 
-
-
-
 // TIEMPOS DE SLEEP (MINUTOS)
-const int sleep_time = 15; 
+const int sleep_time = 5;
 
 // GPS Object
 TinyGPSPlus gps;
@@ -250,12 +247,14 @@ void loop() {
   
   _data_lorawan[28] = uint8_t  (_data[13] * 255/120.0);             // Internal Humidity 
   
-  _data_lorawan[29] = uint8_t  ((_data[14] - 536) * 255/168);       // Battery Level 
+  _data_lorawan[29] = uint8_t  ((_data[14] - 2144.0) * 255.0/670.0);       // Battery Level 
   
   _data_lorawan[30] =   orp_float_bytes[0];                         // ORP
   _data_lorawan[31] =   orp_float_bytes[1];                         // ORP
   _data_lorawan[32] =   orp_float_bytes[2];                         // ORP
   _data_lorawan[33] =   orp_float_bytes[3];                         // ORP
+
+  _data_lorawan[34] = uint8_t (_data[16] * 255/150);                    // SAT
   
 //  _data_lorawan[34] =   sat_float_bytes[0];                         // SAT
 //  _data_lorawan[35] =   sat_float_bytes[1];                         // SAT
@@ -309,6 +308,7 @@ void loop() {
   modem.write(_data_lorawan[31]);
   modem.write(_data_lorawan[32]);
   modem.write(_data_lorawan[33]);
+  modem.write(_data_lorawan[34]);
 
   
 //  modem.write(_data_lorawan[34]);

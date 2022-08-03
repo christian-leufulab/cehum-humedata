@@ -2,8 +2,9 @@
 LoRaModem modem;
 // String devEUI = "A8610A3233298409"; // --> ALPHA 
 // String devEUI = "A8610A3237277009"; // --> ATLAS 
-String appEui = "70B3D57ED0042E7E";
-String appKey = "5ED7E15D4D31804F8E2A8C447CAE76CC";
+String devEUI = "A8610A32371B6E09"; // --> BP 
+String appEui = "A8610A3237267209";
+String appKey = "EF09882529BA1054A2062ACDFBDB30EC";
 uint8_t _data_lorawan[34];
 
 // RTC DS3231
@@ -79,7 +80,7 @@ float internal_temperature = 0;
 float internal_humidity = 0;
 
 const int sd_cs_pin = 4;
-File dataFile;
+//File dataFile;
 float sd_data[16];
 
 // Módulo SIM808
@@ -102,11 +103,11 @@ int batt_level = 0;
 float batt_level_float = 0.0;
 
 // Variables generales
-const int rtd_off_pin = 0;
-const int ph_off_pin = 21;
-const int orp_off_pin = 18;
-const int ec_off_pin = 20;
-const int do_off_pin = 19;
+const int rtd_off_pin = 1;
+const int ph_off_pin = 4;
+const int orp_off_pin = 5;
+const int ec_off_pin = 6;
+const int do_off_pin = 7;
 
 const int _data_size = 17;
 float _data[_data_size];

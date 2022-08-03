@@ -1,3 +1,5 @@
+
+/*
 void do_wire_transmission(){
   Wire.beginTransmission(do_address);
   Wire.write("r");
@@ -18,19 +20,16 @@ void do_wire_transmission(){
   DO = strtok(do_data, ",");
   sat = strtok(NULL, ",");  
 
-  /*
-   * DEBUGGING
-   */
-//  Serial.print("-- DISSOLVED OXYGEN: ");
+    Serial.print("-- DISSOLVED OXYGEN: ");
   _data[0] = (float)atof(DO);
   _data[16] = (float)atof(sat);
 //  Serial.print(_data[0]);
 //  Serial.println(" --");
-  /*
-   * DEBUGGING
-   */
+
 }
 
+*/
+/*
 void ph_wire_transmission(){
   Wire.beginTransmission(ph_address);
   Wire.write('r');
@@ -91,7 +90,7 @@ void ec_wire_transmission(){
 //  Serial.print(_data[5]);
 //  Serial.println(" --");
 }
-
+*/
 void rtd_wire_transmission(){
   Wire.beginTransmission(rtd_address);
   Wire.write('r');
