@@ -23,7 +23,7 @@ void read_battery_level(){
 void write_to_sd(float data0, float data1,float data2,float data3,float data4,
                 float data5, float data6, float data7, float data8, float data9,
                 float data10, float data11, float data12, float data13, float data14,
-                float data15, float data16) 
+                float data15, float data16, float data17, float data18) 
   {
   SPI.begin();
   delay(100);
@@ -63,7 +63,11 @@ void write_to_sd(float data0, float data1,float data2,float data3,float data4,
   dataFile.print(",");
   dataFile.print(data15);
   dataFile.print(",");
-  dataFile.println(data16);
+  dataFile.print(data16);
+  dataFile.print(",");
+  dataFile.print(data17);
+  dataFile.print(",");
+  dataFile.println(data18);
 
   dataFile.close();
   delay(1000);

@@ -63,7 +63,9 @@ byte ec_float_bytes[4];
 // Sensor de oxígeno disuelto de Atlas Scientific
 const int do_address = 97;
 char *DO;
+char *DO_temp;
 char *sat;
+char *sat_temp;
 byte do_code = 0;
 char do_data[20];
 byte do_in_char = 0;
@@ -71,6 +73,8 @@ byte do_i = 0;
 int do_time = 575;
 byte do_float_bytes[4];
 byte sat_float_bytes[4];
+byte do_temp_float_bytes[4];
+byte sat_temp_float_bytes[4];
 
 
 // Sensores y módulos del Shield MKR ENV
@@ -80,7 +84,7 @@ float internal_humidity = 0;
 
 const int sd_cs_pin = 4;
 File dataFile;
-float sd_data[16];
+float sd_data[19];
 
 // Módulo SIM808
 char gps_data[128];
@@ -108,5 +112,5 @@ const int orp_off_pin = 18;
 const int ec_off_pin = 20;
 const int do_off_pin = 19;
 
-const int _data_size = 17;
+const int _data_size = 19;
 float _data[_data_size];

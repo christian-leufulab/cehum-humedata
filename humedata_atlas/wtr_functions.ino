@@ -31,6 +31,39 @@ void do_wire_transmission(){
    */
 }
 
+void do_temp_wire_transmission(){
+  Wire.beginTransmission(do_address);
+  Wire.write("T,25");
+  Wire.endTransmission();
+  delay(do_time);
+  Wire.requestFrom(do_address, 20, 1);
+  do_code = Wire.read();
+  while(Wire.available()){
+    do_in_char = Wire.read();
+    do_data[do_i] = do_in_char;
+    do_i++;
+    if(do_in_char == 0){
+      do_i = 0;
+      break;
+    }
+  }
+
+  DO_temp = strtok(do_data, ",");
+  sat_temp = strtok(NULL, ",");  
+
+  /*
+   * DEBUGGING
+   */
+//  Serial.print("-- DISSOLVED OXYGEN: ");
+  _data[17] = (float)atof(DO_temp);
+  _data[18] = (float)atof(sat_temp);
+//  Serial.print(_data[0]);
+//  Serial.println(" --");
+  /*
+   * DEBUGGING
+   */
+}
+
 void ph_wire_transmission(){
   Wire.beginTransmission(ph_address);
   Wire.write('r');

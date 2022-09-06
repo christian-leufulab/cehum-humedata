@@ -133,7 +133,7 @@ void setup() {
   SD.begin(sd_cs_pin);
   dataFile = SD.open("log-0000.csv", FILE_WRITE);
   delay(1000);
-  dataFile.println("DissolvedOxygen,pH,ElectricalConductivity,TotalDissolvedSolids,Salinity,RelativeDensity,WaterTemperature,InternalPressure,AtmosphericPressure,AtmosphericTemperature,Latitude,Longitude,InternalTemperature,InternalHumidity,BatteryLevel,ORP");
+  dataFile.println("DissolvedOxygen,pH,ElectricalConductivity,TotalDissolvedSolids,Salinity,RelativeDensity,WaterTemperature,InternalPressure,AtmosphericPressure,AtmosphericTemperature,Latitude,Longitude,InternalTemperature,InternalHumidity,BatteryLevel,ORP,Saturation,DissolvedOxygen25,Saturation25");
   dataFile.close();
   delay(100);
   SPI.end();
@@ -168,6 +168,10 @@ void loop() {
 
   delay(1000);
 
+  do_temp_wire_transmission();
+
+  delay(1000);
+
   env_pressure();
 
   get_atm_values();
@@ -193,7 +197,7 @@ void loop() {
   }
   Serial.println("]");
 
-  write_to_sd(_data[0],_data[1],_data[2],_data[3],_data[4],_data[5],_data[6],_data[7],_data[8],_data[9],_data[10],_data[11], _data[12], _data[13], _data[14], _data[15], _data[16]);
+  write_to_sd(_data[0],_data[1],_data[2],_data[3],_data[4],_data[5],_data[6],_data[7],_data[8],_data[9],_data[10],_data[11], _data[12], _data[13], _data[14], _data[15], _data[16], _data[17], _data[18]);
 
   float2Bytes(gps_latitude,&gps_latitude_float_bytes[0]);
   float2Bytes(gps_longitude,&gps_longitude_float_bytes[0]);
@@ -201,6 +205,7 @@ void loop() {
   float2Bytes(_data[3] /*TDS*/,&tds_float_bytes[0]);
   float2Bytes(_data[15] /*ORP*/,&orp_float_bytes[0]);
   float2Bytes(_data[0] /*DO*/,&do_float_bytes[0]);
+  float2Bytes(_data[17] /*DO25*/,&do_temp_float_bytes[0]);
   //float2Bytes(_data[16] /*SAT*/,&sat_float_bytes[0]);
   
 
@@ -254,12 +259,14 @@ void loop() {
   _data_lorawan[32] =   orp_float_bytes[2];                         // ORP
   _data_lorawan[33] =   orp_float_bytes[3];                         // ORP
 
-  _data_lorawan[34] = uint8_t (_data[16] * 255/150);                    // SAT
+  _data_lorawan[34] = uint8_t (_data[16] * 255/150);                // SAT
   
-//  _data_lorawan[34] =   sat_float_bytes[0];                         // SAT
-//  _data_lorawan[35] =   sat_float_bytes[1];                         // SAT
-//  _data_lorawan[36] =   sat_float_bytes[2];                         // SAT
-//  _data_lorawan[37] =   sat_float_bytes[3];                         // SAT
+  _data_lorawan[35] =   do_temp_float_bytes[0];                     // DO25
+  _data_lorawan[36] =   do_temp_float_bytes[1];                     // DO25
+  _data_lorawan[37] =   do_temp_float_bytes[2];                     // DO25
+  _data_lorawan[38] =   do_temp_float_bytes[3];                     // DO25
+
+  _data_lorawan[39] = uint8_t (_data[18] * 255/150);              // SAT25 
 
   Serial.println("LORAWAN HEX DATA: ");
   
@@ -309,14 +316,11 @@ void loop() {
   modem.write(_data_lorawan[32]);
   modem.write(_data_lorawan[33]);
   modem.write(_data_lorawan[34]);
-
-  
-//  modem.write(_data_lorawan[34]);
-//  modem.write(_data_lorawan[35]);
-//  modem.write(_data_lorawan[36]);
-//  modem.write(_data_lorawan[37]);
-  
-  
+  modem.write(_data_lorawan[35]);
+  modem.write(_data_lorawan[36]);
+  modem.write(_data_lorawan[37]);
+  modem.write(_data_lorawan[38]);
+  modem.write(_data_lorawan[39]);
   
   
   err = modem.endPacket(true);
