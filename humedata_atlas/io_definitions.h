@@ -1,10 +1,15 @@
 // Variables LoRaWAN
 LoRaModem modem;
-// String devEUI = "A8610A3233298409"; // --> ALPHA 
-// String devEUI = "A8610A3237277009"; // --> ATLAS 
-String appEui = "70B3D57ED0042E7E";
-String appKey = "5ED7E15D4D31804F8E2A8C447CAE76CC";
-uint8_t _data_lorawan[34];
+// String devEUI = "A8610A3233298409";                  // --> ALPHA 
+// String devEUI = "A8610A3237277009";                  // --> ATLAS 
+
+//String appEui = "A8610A3237267209";                     // --> BP
+//String appKey = "EF09882529BA1054A2062ACDFBDB30EC";     // --> BP
+
+String appEui = "70B3D57ED0042E7E";                     // --> ATLAS
+String appKey = "5ED7E15D4D31804F8E2A8C447CAE76CC";     // --> ATLAS 
+
+uint8_t _data_lorawan[45];
 
 // RTC DS3231
 //RTC_DS3231 rtc;
@@ -33,11 +38,12 @@ float rtd_tmp_float;
 const int ph_address = 99;
 byte ph_code = 0;
 char ph_data[20];
+char ph_data_temp[20];
 byte ph_in_char = 0;
 byte ph_i = 0;
 int ph_time = 815;
 
-// Sensor de ORP de Atlas Scientific¡
+// Sensor de ORP de Atlas Scientific
 const int orp_address = 98;
 byte orp_code = 0;
 char orp_data[20];
@@ -54,11 +60,13 @@ byte ec_in_char = 0;
 byte ec_i = 0;
 int ec_time = 570;
 char *ec;
+char *ec_temp;
 char *tds;
 char *sal;
 char *sg;
 byte tds_float_bytes[4];
 byte ec_float_bytes[4];
+byte ec_temp_float_bytes[4];
 
 // Sensor de oxígeno disuelto de Atlas Scientific
 const int do_address = 97;
@@ -84,7 +92,7 @@ float internal_humidity = 0;
 
 const int sd_cs_pin = 4;
 File dataFile;
-float sd_data[19];
+float sd_data[21];
 
 // Módulo SIM808
 char gps_data[128];
@@ -112,5 +120,5 @@ const int orp_off_pin = 18;
 const int ec_off_pin = 20;
 const int do_off_pin = 19;
 
-const int _data_size = 19;
+const int _data_size = 21;
 float _data[_data_size];

@@ -12,10 +12,7 @@
 #include <SPI.h>
 #include <SD.h>
 #include <MKRWAN.h>
-//#include <OneWire.h>
-//#include <DallasTemperature.h>
 #include <Adafruit_BMP280.h>
-//#include <RTClib.h>
 #include "ArduinoLowPower.h"
 #include "TinyGPS++.h"
 #include "io_definitions.h"
@@ -133,7 +130,7 @@ void setup() {
   SD.begin(sd_cs_pin);
   dataFile = SD.open("log-0000.csv", FILE_WRITE);
   delay(1000);
-  dataFile.println("DissolvedOxygen,pH,ElectricalConductivity,TotalDissolvedSolids,Salinity,RelativeDensity,WaterTemperature,InternalPressure,AtmosphericPressure,AtmosphericTemperature,Latitude,Longitude,InternalTemperature,InternalHumidity,BatteryLevel,ORP,Saturation,DissolvedOxygen25,Saturation25");
+  dataFile.println("DissolvedOxygen,pH,ElectricalConductivity,TotalDissolvedSolids,Salinity,RelativeDensity,WaterTemperature,InternalPressure,AtmosphericPressure,AtmosphericTemperature,Latitude,Longitude,InternalTemperature,InternalHumidity,BatteryLevel,ORP,Saturation,DissolvedOxygenTemp,SaturationTemp,ElectricalConductivityTemp,pHTemp");
   dataFile.close();
   delay(100);
   SPI.end();
@@ -172,6 +169,14 @@ void loop() {
 
   delay(1000);
 
+  ec_temp_wire_transmission();
+
+  delay(1000);
+
+  ph_temp_wire_transmission();
+
+  delay(1000);
+
   env_pressure();
 
   get_atm_values();
@@ -197,7 +202,7 @@ void loop() {
   }
   Serial.println("]");
 
-  write_to_sd(_data[0],_data[1],_data[2],_data[3],_data[4],_data[5],_data[6],_data[7],_data[8],_data[9],_data[10],_data[11], _data[12], _data[13], _data[14], _data[15], _data[16], _data[17], _data[18]);
+  write_to_sd(_data[0],_data[1],_data[2],_data[3],_data[4],_data[5],_data[6],_data[7],_data[8],_data[9],_data[10],_data[11], _data[12], _data[13], _data[14], _data[15], _data[16], _data[17], _data[18], _data[19], _data[20]);
 
   float2Bytes(gps_latitude,&gps_latitude_float_bytes[0]);
   float2Bytes(gps_longitude,&gps_longitude_float_bytes[0]);
@@ -206,8 +211,7 @@ void loop() {
   float2Bytes(_data[15] /*ORP*/,&orp_float_bytes[0]);
   float2Bytes(_data[0] /*DO*/,&do_float_bytes[0]);
   float2Bytes(_data[17] /*DO25*/,&do_temp_float_bytes[0]);
-  //float2Bytes(_data[16] /*SAT*/,&sat_float_bytes[0]);
-  
+  float2Bytes(_data[20] /*DO25*/,&ec_temp_float_bytes[0]);  
 
   _data_lorawan[0]  = do_float_bytes[0];                            // DO 
   _data_lorawan[1]  = do_float_bytes[1];                            // DO 
@@ -252,21 +256,30 @@ void loop() {
   
   _data_lorawan[28] = uint8_t  (_data[13] * 255/120.0);             // Internal Humidity 
   
-  _data_lorawan[29] = uint8_t  ((_data[14] - 2144.0) * 255.0/670.0);       // Battery Level 
+  _data_lorawan[29] = uint8_t  ((_data[14] - 2144.0) * 255.0/670.0);   // Battery Level 
   
-  _data_lorawan[30] =   orp_float_bytes[0];                         // ORP
-  _data_lorawan[31] =   orp_float_bytes[1];                         // ORP
-  _data_lorawan[32] =   orp_float_bytes[2];                         // ORP
-  _data_lorawan[33] =   orp_float_bytes[3];                         // ORP
+  _data_lorawan[30] =   orp_float_bytes[0];                            // ORP
+  _data_lorawan[31] =   orp_float_bytes[1];                            // ORP
+  _data_lorawan[32] =   orp_float_bytes[2];                            // ORP
+  _data_lorawan[33] =   orp_float_bytes[3];                            // ORP
 
-  _data_lorawan[34] = uint8_t (_data[16] * 255/150);                // SAT
+  _data_lorawan[34] = uint8_t (_data[16] * 255/150);                   // SAT
   
-  _data_lorawan[35] =   do_temp_float_bytes[0];                     // DO25
-  _data_lorawan[36] =   do_temp_float_bytes[1];                     // DO25
-  _data_lorawan[37] =   do_temp_float_bytes[2];                     // DO25
-  _data_lorawan[38] =   do_temp_float_bytes[3];                     // DO25
+  _data_lorawan[35] =   do_temp_float_bytes[0];                        // Temperature compensated DO
+  _data_lorawan[36] =   do_temp_float_bytes[1];                        // Temperature compensated DO
+  _data_lorawan[37] =   do_temp_float_bytes[2];                        // Temperature compensated DO
+  _data_lorawan[38] =   do_temp_float_bytes[3];                        // Temperature compensated DO
 
-  _data_lorawan[39] = uint8_t (_data[18] * 255/150);              // SAT25 
+  _data_lorawan[39] = uint8_t (_data[18] * 255/150);                   // Temperature compensated saturation 
+
+  _data_lorawan[40] = ec_temp_float_bytes[0];                          // Temperature compensated EC
+  _data_lorawan[41] = ec_temp_float_bytes[1];                          // Temperature compensated EC
+  _data_lorawan[42] = ec_temp_float_bytes[2];                          // Temperature compensated EC
+  _data_lorawan[43] = ec_temp_float_bytes[3];                          // Temperature compensated EC
+
+  _data_lorawan[44] = uint8_t (_data[20] * 255/14.0);                  // Temperature compensated pH
+
+  
 
   Serial.println("LORAWAN HEX DATA: ");
   
@@ -321,6 +334,11 @@ void loop() {
   modem.write(_data_lorawan[37]);
   modem.write(_data_lorawan[38]);
   modem.write(_data_lorawan[39]);
+  modem.write(_data_lorawan[40]);
+  modem.write(_data_lorawan[41]);
+  modem.write(_data_lorawan[42]);
+  modem.write(_data_lorawan[43]);
+  modem.write(_data_lorawan[44]);
   
   
   err = modem.endPacket(true);
@@ -331,8 +349,6 @@ void loop() {
     Serial.println("-- ERROR ENVIANDO EL MENSAJE A TRAVÉS DE LORAWAN --");
   }
 
-  
-  
   //delay(360*1000);
   LowPower.sleep(sleep_time*60*1000); // 10 minutos * 60*segundos * 1000 milisegundos
 }

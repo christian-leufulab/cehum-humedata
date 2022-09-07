@@ -87,6 +87,29 @@ void ph_wire_transmission(){
 //  Serial.println(" --");
 }
 
+void ph_temp_wire_transmission(){
+  Wire.beginTransmission(ph_address);
+  Wire.write('r');
+  Wire.endTransmission();
+  delay(ph_time);
+  Wire.requestFrom(ph_address, 20, 1);
+  ph_code = Wire.read();
+
+  while(Wire.available()){
+    ph_in_char = Wire.read();
+    ph_data_temp[ph_i] = ph_in_char;
+    ph_i++;
+    if(ph_in_char == 0){
+      ph_i = 0;
+      break;
+    }
+  }
+//  Serial.print("-- PH: ");
+  _data[20] = (float)atof(ph_data_temp);
+//  Serial.print(_data[1]);
+//  Serial.println(" --");
+}
+
 void ec_wire_transmission(){
   Wire.beginTransmission(ec_address);
   Wire.write('r');
@@ -123,6 +146,31 @@ void ec_wire_transmission(){
   _data[5] = (float)atof(sg);
 //  Serial.print(_data[5]);
 //  Serial.println(" --");
+}
+
+void ec_temp_wire_transmission(){
+  Wire.beginTransmission(ec_address);
+  Wire.write("T,25");
+  Wire.endTransmission();
+  delay(ec_time);
+  Wire.requestFrom(ec_address, 32, 1);
+  ec_code = Wire.read();
+  while(Wire.available()){
+    ec_in_char = Wire.read();
+    ec_data[ec_i] = ec_in_char;
+    ec_i++;
+    if(ec_in_char == 0){
+      ec_i = 0;
+      break;
+    }
+  }
+  
+  ec_temp = strtok(ec_data, ",");
+  tds = strtok(NULL, ",");
+  sal = strtok(NULL, ",");
+  sg = strtok(NULL, ",");
+
+  _data[19] = (float)atof(ec_temp);
 }
 
 void rtd_wire_transmission(){
@@ -172,15 +220,3 @@ void orp_wire_transmission(){
   }
   _data[15] = (float)atof(orp_data);
 }
-
-/*
-void get_water_temp(){
-  sensors.begin();
-  sensors.requestTemperatures();
-  water_temperature = sensors.getTempCByIndex(0);
-//  Serial.print("-- WATER TEMPERATURE: ");
-  _data[6] = water_temperature;
-//  Serial.print(water_temperature);
-//  Serial.println("°C --");
-  }
-*/
