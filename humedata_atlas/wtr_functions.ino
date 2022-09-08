@@ -14,6 +14,7 @@ void do_wire_transmission(){
       break;
     }
   }
+  do_i = 0;
 
   DO = strtok(do_data, ",");
   sat = strtok(NULL, ",");  
@@ -33,7 +34,11 @@ void do_wire_transmission(){
 
 void do_temp_wire_transmission(){
   Wire.beginTransmission(do_address);
-  Wire.write("t,25");
+  Wire.write("t,20");
+  Wire.endTransmission();
+  delay(250);
+  Wire.beginTransmission(do_address);
+  Wire.write('r');
   Wire.endTransmission();
   delay(do_time);
   Wire.requestFrom(do_address, 20, 1);
@@ -47,7 +52,8 @@ void do_temp_wire_transmission(){
       break;
     }
   }
-
+  do_i = 0;
+  
   DO_temp = strtok(do_data, ",");
   sat_temp = strtok(NULL, ",");  
 
@@ -81,6 +87,7 @@ void ph_wire_transmission(){
       break;
     }
   }
+  ph_i = 0;
 //  Serial.print("-- PH: ");
   _data[1] = (float)atof(ph_data);
 //  Serial.print(_data[1]);
@@ -88,6 +95,10 @@ void ph_wire_transmission(){
 }
 
 void ph_temp_wire_transmission(){
+  Wire.beginTransmission(ph_address);
+  Wire.write("t,25");
+  Wire.endTransmission();
+  delay(250);
   Wire.beginTransmission(ph_address);
   Wire.write('r');
   Wire.endTransmission();
@@ -104,6 +115,7 @@ void ph_temp_wire_transmission(){
       break;
     }
   }
+  ph_i = 0;
 //  Serial.print("-- PH: ");
   _data[20] = (float)atof(ph_data_temp);
 //  Serial.print(_data[1]);
@@ -126,7 +138,7 @@ void ec_wire_transmission(){
       break;
     }
   }
-  
+  ec_i = 0;
   ec = strtok(ec_data, ",");
   tds = strtok(NULL, ",");
   sal = strtok(NULL, ",");
@@ -152,6 +164,10 @@ void ec_temp_wire_transmission(){
   Wire.beginTransmission(ec_address);
   Wire.write("t,25");
   Wire.endTransmission();
+  delay(250);
+  Wire.beginTransmission(ec_address);
+  Wire.write('r');
+  Wire.endTransmission();
   delay(ec_time);
   Wire.requestFrom(ec_address, 32, 1);
   ec_code = Wire.read();
@@ -164,6 +180,7 @@ void ec_temp_wire_transmission(){
       break;
     }
   }
+  ec_i = 0;
   
   ec_temp = strtok(ec_data, ",");
   tds = strtok(NULL, ",");
