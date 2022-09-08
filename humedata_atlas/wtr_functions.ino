@@ -33,7 +33,7 @@ void do_wire_transmission(){
 
 void do_temp_wire_transmission(){
   Wire.beginTransmission(do_address);
-  Wire.write("T,25");
+  Wire.write("t,25");
   Wire.endTransmission();
   delay(do_time);
   Wire.requestFrom(do_address, 20, 1);
@@ -150,7 +150,7 @@ void ec_wire_transmission(){
 
 void ec_temp_wire_transmission(){
   Wire.beginTransmission(ec_address);
-  Wire.write("T,25");
+  Wire.write("t,25");
   Wire.endTransmission();
   delay(ec_time);
   Wire.requestFrom(ec_address, 32, 1);

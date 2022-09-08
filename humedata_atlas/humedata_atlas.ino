@@ -263,14 +263,14 @@ void loop() {
   _data_lorawan[32] =   orp_float_bytes[2];                            // ORP
   _data_lorawan[33] =   orp_float_bytes[3];                            // ORP
 
-  _data_lorawan[34] = uint8_t (_data[16] * 255/150);                   // SAT
+  _data_lorawan[34] = uint8_t (_data[16] * 255/150.0);                   // SAT
   
   _data_lorawan[35] =   do_temp_float_bytes[0];                        // Temperature compensated DO
   _data_lorawan[36] =   do_temp_float_bytes[1];                        // Temperature compensated DO
   _data_lorawan[37] =   do_temp_float_bytes[2];                        // Temperature compensated DO
   _data_lorawan[38] =   do_temp_float_bytes[3];                        // Temperature compensated DO
 
-  _data_lorawan[39] = uint8_t (_data[18] * 255/150);                   // Temperature compensated saturation 
+  _data_lorawan[39] = uint8_t (_data[18] * 255/150.0);                   // Temperature compensated saturation 
 
   _data_lorawan[40] = ec_temp_float_bytes[0];                          // Temperature compensated EC
   _data_lorawan[41] = ec_temp_float_bytes[1];                          // Temperature compensated EC

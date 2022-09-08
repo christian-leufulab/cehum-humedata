@@ -84,7 +84,6 @@ byte sat_float_bytes[4];
 byte do_temp_float_bytes[4];
 byte sat_temp_float_bytes[4];
 
-
 // Sensores y módulos del Shield MKR ENV
 float internal_pressure = 0;
 float internal_temperature = 0;
@@ -99,10 +98,6 @@ char gps_data[128];
 byte gps_code = 0;
 byte gps_in_char = 0; 
 byte gps_i = 0;
-
-char *gps_left_waste;
-char *gps_lat;
-char *gps_lon;
 
 float gps_latitude = 0;
 float gps_longitude = 0;
