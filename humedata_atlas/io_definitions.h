@@ -3,11 +3,11 @@ LoRaModem modem;
 // String devEUI = "A8610A3233298409";                  // --> ALPHA 
 // String devEUI = "A8610A3237277009";                  // --> ATLAS 
 
-String appEui = "A8610A3237267209";                     // --> BP
-String appKey = "EF09882529BA1054A2062ACDFBDB30EC";     // --> BP
+//String appEui = "A8610A3237267209";                     // --> BP
+//String appKey = "EF09882529BA1054A2062ACDFBDB30EC";     // --> BP
 
-//String appEui = "70B3D57ED0042E7E";                     // --> ATLAS
-//String appKey = "5ED7E15D4D31804F8E2A8C447CAE76CC";     // --> ATLAS 
+String appEui = "70B3D57ED0042E7E";                     // --> ATLAS
+String appKey = "5ED7E15D4D31804F8E2A8C447CAE76CC";     // --> ATLAS 
 
 uint8_t _data_lorawan[45];
 
