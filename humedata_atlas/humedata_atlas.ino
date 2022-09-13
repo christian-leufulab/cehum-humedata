@@ -212,7 +212,7 @@ void loop() {
   float2Bytes(_data[15] /*ORP*/,&orp_float_bytes[0]);
   float2Bytes(_data[0] /*DO*/,&do_float_bytes[0]);
   float2Bytes(_data[17] /*DO25*/,&do_temp_float_bytes[0]);
-  float2Bytes(_data[20] /*DO25*/,&ec_temp_float_bytes[0]);  
+  float2Bytes(_data[19] /*DO25*/,&ec_temp_float_bytes[0]);  
 
   _data_lorawan[0]  = do_float_bytes[0];                            // DO 
   _data_lorawan[1]  = do_float_bytes[1];                            // DO 
