@@ -186,10 +186,6 @@ void ec_temp_wire_transmission(){
   ec_i = 0;
   
   ec_temp = strtok(ec_data, ",");
-  tds = strtok(NULL, ",");
-  sal = strtok(NULL, ",");
-  sg = strtok(NULL, ",");
-
   _data[19] = (float)atof(ec_temp);
 }
 

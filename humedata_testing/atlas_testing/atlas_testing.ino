@@ -146,7 +146,7 @@ void loop() {
   delay(1500);
 
   rtd_wire_transmission();
-  inst_temp = String(_data[6]);
+  inst_temp = String(_data[12]);
 
   delay(1000);
   
@@ -271,7 +271,7 @@ void loop() {
   _data_lorawan[37] =   do_temp_float_bytes[2];                        // Temperature compensated DO
   _data_lorawan[38] =   do_temp_float_bytes[3];                        // Temperature compensated DO
 
-  _data_lorawan[39] = uint8_t (_data[18] * 255/150.0);                   // Temperature compensated saturation 
+  _data_lorawan[39] = uint8_t (_data[18] * 255/150.0);                 // Temperature compensated saturation 
 
   _data_lorawan[40] = ec_temp_float_bytes[0];                          // Temperature compensated EC
   _data_lorawan[41] = ec_temp_float_bytes[1];                          // Temperature compensated EC
@@ -350,6 +350,6 @@ void loop() {
     Serial.println("-- ERROR ENVIANDO EL MENSAJE A TRAVÉS DE LORAWAN --");
   }
 
-  //delay(360*1000);
-  LowPower.sleep(sleep_time*60*1000); // e.g. 10 minutos * 60*segundos * 1000 milisegundos
+  delay(120*1000);
+  //LowPower.sleep(sleep_time*60*1000); // 10 minutos * 60*segundos * 1000 milisegundos
 }
