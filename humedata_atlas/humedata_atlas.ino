@@ -174,6 +174,10 @@ void loop() {
 
   delay(1000);
 
+  do_15_wire_transmission();
+
+  delay(1000);
+
   ph_temp_wire_transmission();
 
   delay(1000);
@@ -202,8 +206,7 @@ void loop() {
     }
   }
   Serial.println("]");
-
-  write_to_sd(_data[0],_data[1],_data[2],_data[3],_data[4],_data[5],_data[6],_data[7],_data[8],_data[9],_data[10],_data[11], _data[12], _data[13], _data[14], _data[15], _data[16], _data[17], _data[18], _data[19], _data[20]);
+  write_to_sd(_data[0],_data[1],_data[2],_data[3],_data[4],_data[5],_data[6],_data[7],_data[8],_data[9],_data[10],_data[11], _data[12], _data[13], _data[14], _data[15], _data[16], _data[17], _data[18], _data[19], _data[20], _data[21]);
 
   float2Bytes(gps_latitude,&gps_latitude_float_bytes[0]);
   float2Bytes(gps_longitude,&gps_longitude_float_bytes[0]);
@@ -211,8 +214,9 @@ void loop() {
   float2Bytes(_data[3] /*TDS*/,&tds_float_bytes[0]);
   float2Bytes(_data[15] /*ORP*/,&orp_float_bytes[0]);
   float2Bytes(_data[0] /*DO*/,&do_float_bytes[0]);
-  float2Bytes(_data[17] /*DO25*/,&do_temp_float_bytes[0]);
-  float2Bytes(_data[19] /*DO25*/,&ec_temp_float_bytes[0]);  
+  float2Bytes(_data[17] /*DOTEMP*/,&do_temp_float_bytes[0]);
+  float2Bytes(_data[19] /*ECTEMP*/,&ec_temp_float_bytes[0]);  
+  float2Bytes(_data[21] /*DO15*/,&do_15_float_bytes[0]);  
 
   _data_lorawan[0]  = do_float_bytes[0];                            // DO 
   _data_lorawan[1]  = do_float_bytes[1];                            // DO 
@@ -280,6 +284,11 @@ void loop() {
 
   _data_lorawan[44] = uint8_t (_data[20] * 255/14.0);                  // Temperature compensated pH
 
+  _data_lorawan[45] = do_15_float_bytes[0];
+  _data_lorawan[46] = do_15_float_bytes[1];
+  _data_lorawan[47] = do_15_float_bytes[2];
+  _data_lorawan[48] = do_15_float_bytes[3];
+
   
 
   Serial.println("LORAWAN HEX DATA: ");
@@ -340,6 +349,10 @@ void loop() {
   modem.write(_data_lorawan[42]);
   modem.write(_data_lorawan[43]);
   modem.write(_data_lorawan[44]);
+  modem.write(_data_lorawan[45]);
+  modem.write(_data_lorawan[46]);
+  modem.write(_data_lorawan[47]);
+  modem.write(_data_lorawan[48]);
   
   
   err = modem.endPacket(true);
