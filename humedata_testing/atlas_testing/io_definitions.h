@@ -9,7 +9,7 @@ String appKey = "EF09882529BA1054A2062ACDFBDB30EC";     // --> BP
 //String appEui = "70B3D57ED0042E7E";                     // --> ATLAS
 //String appKey = "5ED7E15D4D31804F8E2A8C447CAE76CC";     // --> ATLAS 
 
-uint8_t _data_lorawan[45];
+uint8_t _data_lorawan[49];
 
 // RTC DS3231
 //RTC_DS3231 rtc;
@@ -67,8 +67,10 @@ byte ec_temp_float_bytes[4];
 const int do_address = 97;
 char *DO;
 char *DO_temp;
+char *DO_15;
 char *sat;
 char *sat_temp;
+char *sat_15;
 byte do_code = 0;
 char do_data[20];
 byte do_in_char = 0;
@@ -78,6 +80,7 @@ byte do_float_bytes[4];
 byte sat_float_bytes[4];
 byte do_temp_float_bytes[4];
 byte sat_temp_float_bytes[4];
+byte do_15_float_bytes[4];
 
 // Sensores y módulos del Shield MKR ENV
 float internal_pressure = 0;
@@ -86,7 +89,7 @@ float internal_humidity = 0;
 
 const int sd_cs_pin = 4;
 File dataFile;
-float sd_data[21];
+float sd_data[22];
 
 // Módulo SIM808
 char gps_data[128];
@@ -110,5 +113,5 @@ const int orp_off_pin = 18;
 const int ec_off_pin = 20;
 const int do_off_pin = 19;
 
-const int _data_size = 21;
+const int _data_size = 22;
 float _data[_data_size];
