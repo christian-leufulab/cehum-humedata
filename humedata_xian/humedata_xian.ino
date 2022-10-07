@@ -35,6 +35,6 @@ void loop() {
   LowPower.sleep((sleep_time - gps_fix_time)*60*1000);
   digitalWrite(gps_switch, HIGH);
   delay(1000);
-  //delay(gps_fix_time*60*1000);
-  LowPower.sleep(gps_fix_time*60*1000);
+  delay(gps_fix_time*60*1000);
+  //LowPower.sleep(gps_fix_time*60*1000);
 }
