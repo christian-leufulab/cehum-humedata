@@ -31,7 +31,6 @@ float gps_latitude = 0.0;
 float gps_longitude = 0.0;
 byte gps_latitude_float_bytes[4];
 byte gps_longitude_float_bytes[4];
-const int gps_fix_time = 2;
 
 // UART commands to request sensors values
 byte request_ec[]   = {0x13, 0x03, 0x26, 0x00, 0x00, 0x05, 0x8d, 0xf3}; 
