@@ -5,10 +5,7 @@ LoRaModem modem;
 String devEUI = "A8610A3237267209"; // --> XI'AN
 String appEui = "70B3D57ED0042E7E";
 String appKey = "1195AF29AFFE1665C5AF311B4DE62D5A";
-uint8_t _data_lorawan[34];
-
-// Sleep time in minutes
-const int sleep_time = 5; 
+uint8_t _data_lorawan[49];
 
 // BMP280
 Adafruit_BMP280 bmp;
@@ -25,8 +22,8 @@ const int _data_size = 17;
 float _data[_data_size];
 
 // Battery Level Reading
-int batt_level = 0;
-float batt_level_float = 0.0;
+int batt_reading = 0;
+  float batt_voltage = 0.0;
 
 // GPS 
 TinyGPSPlus gps;

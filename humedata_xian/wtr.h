@@ -1,28 +1,8 @@
-/*
-             MEASUREMENT UNITS      
- *[0]  --> DISSOLVED OXYGEN          [mg/L]
- *[1]  --> PH                        [-]
- *[2]  --> ELECTRICAL CONDUCTIVITY   [uS/cm]
- *[3]  --> TOTAL DISSOLVED SOLIDS    [ppm]
- *[4]  --> SALINITY                  [ppt]
- *[5]  --> RELATIVE DENSITY          [-]
- *[6]  --> WATER TEMPERATURE         [°C]
- *[7]  --> INTERNAL PRESSURE         [hPa]
- *[8]  --> ATMOSPHERIC PRESSURE      [hPa]
- *[9]  --> ATMOSPHERIC TEMPERATURE   [°C]
- *[10] --> GPS LATITUDE              [°]
- *[11] --> GPS LONGITUDE             [°]
- *[12] --> INTERNAL TEMPERATURE      [°C]
- *[13] --> INTERNAL HUMIDITY         [%]
- *[14] --> BATTERY LEVEL             [V]
- *[15] --> ORP                       [mV]
- *[16] --> SATURATION                [%]
- */
-
 void read_xian_sensors()
 {
-  digitalWrite(gps_switch, LOW);
-  digitalWrite(xian_switch, HIGH);
+  digitalWrite(GPS_SWITCH, LOW);
+  digitalWrite(XIAN_SWITCH, HIGH);
+  digitalWrite(RS485_SWITCH, HIGH);
   delay(500);
   while((orp_received == 0) && (reading_tries < 5))
     {
@@ -34,11 +14,14 @@ void read_xian_sensors()
         {
           Serial1.readBytes(orp_readings, 50);
           orp_f = bytes2Float(orp_readings[3], orp_readings[4], orp_readings[5], orp_readings[6]);
-          orp_received = 1;
+          if(orp_f != 0.0)
+          {
+            orp_received = 1;
+          }
         }
         else
         {
-          delay(500);
+          delay(1000);
           orp_readings[3] = 0;
           orp_readings[4] = 0;
           orp_readings[5] = 0;
@@ -63,7 +46,7 @@ void read_xian_sensors()
         }
         else
         {
-          delay(500);
+          delay(1000);
           ec_readings[3] = 0;
           ec_readings[4] = 0;
           ec_readings[5] = 0;
@@ -88,7 +71,7 @@ void read_xian_sensors()
         }
         else
         {
-          delay(500);
+          delay(1000);
           ph_readings[3] = 0;
           ph_readings[4] = 0;
           ph_readings[5] = 0;
@@ -97,7 +80,8 @@ void read_xian_sensors()
           reading_tries++;
         }
     }
-  
+    
+    reading_tries = 0;
     while((do_received == 0) && (reading_tries < 5))
     {
       for(int i=0; i<8; i++)
@@ -114,7 +98,7 @@ void read_xian_sensors()
         }
         else
         {
-          delay(500);
+          delay(1000);
           do_readings[3] = 0;
           do_readings[4] = 0;
           do_readings[5] = 0;
@@ -149,6 +133,7 @@ void read_xian_sensors()
     ec_received  = 0;
     orp_received = 0;
     reading_tries = 0;
-    digitalWrite(xian_switch, LOW);
-    delay(500);
+    
+    digitalWrite(XIAN_SWITCH, LOW);
+    digitalWrite(RS485_SWITCH, LOW);
 }
