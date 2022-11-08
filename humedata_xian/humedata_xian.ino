@@ -7,8 +7,8 @@
  #include "libs.h"
 
 // Sleep time in minutes
-const int sleep_time = 5; 
-const int gps_fix_time = 2;
+const int sleep_time = 10; 
+const int gps_fix_time = 4;
 
 void setup() {
   Serial.begin(115200);
