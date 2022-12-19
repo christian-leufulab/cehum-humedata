@@ -8,7 +8,7 @@
 
 // Sleep time in minutes
 const int sleep_time = 10; 
-const int gps_fix_time = 4;
+const int gps_fix_time = 3;
 
 void setup() {
   Serial.begin(115200);
@@ -20,7 +20,6 @@ void setup() {
 }
 
 void loop() {
-  
   env_pressure();
   get_atm_values();
   read_battery_level();
@@ -28,10 +27,10 @@ void loop() {
   store_sd_data();
   send_lorawan_data();
 
-  delay((sleep_time - gps_fix_time)*60*1000);
-  //LowPower.sleep((sleep_time - gps_fix_time)*60*1000);
+  //delay((sleep_time - gps_fix_time)*60*1000);
+  LowPower.sleep((sleep_time - gps_fix_time)*60*1000);
   digitalWrite(GPS_SWITCH, HIGH);
-  delay(gps_fix_time*60*1000);
-  //LowPower.sleep(gps_fix_time*60*1000);
+  //delay(gps_fix_time*60*1000);
+  LowPower.sleep(gps_fix_time*60*1000);
   get_gps_data();
 }

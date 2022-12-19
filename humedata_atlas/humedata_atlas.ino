@@ -39,7 +39,7 @@
  *[15] --> ORP                       [mV]
  */
 
-/*        RANGO SENSORES
+/* RANGO SENSORES (OBTENIDOS DESDE HOJAS DE DATOS DE ATLAS SCIENTIFIC)
  *         
  * DISSOLVED OXYGEN        --> 0 - 100 [mg/L]     [1 byte]  [O]
  * pH                      --> 0 - 14             [1 byte]  [O]
@@ -61,6 +61,8 @@
  * TOTAL:                                         [31 bytes]
  */
 
+// Función para transformar un flotante en sus 4 bytes componentes
+// Forma de utilizar float2Bytes(flotante a transformar en bytes, arreglo en el que guardar los bytes)
 void float2Bytes(float val,byte* bytes_array){
   // Create union of shared memory space
   union {
@@ -73,21 +75,25 @@ void float2Bytes(float val,byte* bytes_array){
   memcpy(bytes_array, u.temp_array, 4);
 }
 
-// TIEMPOS DE SLEEP (MINUTOS)
+// Tiempo de espera entre muestreado de datos (en minutos)
 const int sleep_time = 5;
 
-// GPS Object
+// Objeto GPS
 TinyGPSPlus gps;
 
 void setup() {
+  // Se inicia la comunicación UART para debugging
   Serial.begin(115200);
+  // Se inicia la comunicación UART para comunicarse con el módulo GPS 
   Serial1.begin(9600);
+  // Se declaran las salidas de apagado de sensores Atlas Scientific
   pinMode(rtd_off_pin, OUTPUT);
   pinMode(ph_off_pin, OUTPUT);
   pinMode(orp_off_pin, OUTPUT);
   pinMode(ec_off_pin, OUTPUT);
   pinMode(do_off_pin, OUTPUT);
-  
+
+  // Se inician los sensores Atlas Scientific en modo apagado
   digitalWrite(rtd_off_pin, LOW);
   digitalWrite(ph_off_pin, LOW);
   digitalWrite(orp_off_pin, LOW);
@@ -96,100 +102,99 @@ void setup() {
 
   delay(1000);
   
+  // Se inicia el módulo LoRaWAN para el estándar indicado en Chile (Australia 915 MHz)
   if (!modem.begin(AU915)) {
     Serial.println("-- NO SE HA PODIDO INICIAR EL MÓDULO LORAWAN --");
     while (1) {}
   };
-  
+
+  // Se imprime la versión del módulo LoRaWAN de Arduino
   Serial.print("-- LA VERSIÓN DE TU MÓDULO ES: ");
   Serial.print(modem.version());
   Serial.println(" --");
-  
+
+  // Se imprime el número único del dispositivo
   Serial.print("-- EL EUI DE TU DISPOSITIVO ES: ");
   Serial.print(modem.deviceEUI());
   Serial.println(" --");
 
+  // Este comando se utiliza para fijar el rango de frecuencia de comunicación al aceptado por TTN (The Things Network)
   Serial.println(modem.sendMask("ff000001f000ffff00020000"));
+
+  // Se conecta el módulo a la red LoRaWAN disponible a través de OTAA (Over The Air Activation)
   int connected = modem.joinOTAA(appEui, appKey);
 
+  // Se imprime el estado de conexión con la red LoRaWAN
   Serial.print("-- CONNECTED STATUS: ");
   Serial.print(connected);
   Serial.println(" --");
 
+  // Se declara el intervalo mínimo de envío de datos desde el módulo (esta función parece no tener ningún efecto en la ejecución del código)
    modem.minPollInterval(300);
 
-  Serial1.begin(9600);
-
-//  delay(10000);
-//  turn_on_gps();
-
+  // Se inicia la librería Wire para la comunicación con los sensores I2C
   Wire.begin();
-  
+
+  // Se inicia la librería SPI para poder almacenar los datos en la memoria SD
   SPI.begin();
   delay(100);
+  // Se inicia la librería SD para almacenar los datos en la memoria SD
   SD.begin(sd_cs_pin);
   dataFile = SD.open("log-0000.csv", FILE_WRITE);
   delay(1000);
+  // Se almacena la cabecera de los datos a almacenar 
   dataFile.println("DissolvedOxygen,pH,ElectricalConductivity,TotalDissolvedSolids,Salinity,RelativeDensity,WaterTemperature,InternalPressure,AtmosphericPressure,AtmosphericTemperature,Latitude,Longitude,InternalTemperature,InternalHumidity,BatteryLevel,ORP,Saturation,DissolvedOxygenTemp,SaturationTemp,ElectricalConductivityTemp,pHTemp");
   dataFile.close();
   delay(100);
   SPI.end();
 }
 
+// Inicio del ciclo infinito
 void loop() {
+  // Se encienden los sensores de Atlas Scientific
   digitalWrite(rtd_off_pin, HIGH);
   digitalWrite(ph_off_pin, HIGH);
   digitalWrite(orp_off_pin, HIGH);
   digitalWrite(ec_off_pin, HIGH);
   digitalWrite(do_off_pin, HIGH);
-
   delay(1500);
 
+  // Se obtiene la medición de temperatura del agua y se almacena el dato para utilizarlo posteriormente en la petición de datos con ajuste de temperatura
   rtd_wire_transmission();
-  inst_temp = String(_data[6]);
+  inst_temp = String(_data[6]); // Variable utilizada para el ajuste de temperatura
 
+  // Se solicitan las mediciones de los sensores Atlas Scientific (En orden: DO, pH, EC, ORP, DOtemp, ECtemp, DO15ºC, pHtemp)
   delay(1000);
-  
   do_wire_transmission();
-
   delay(1000);
-
   ph_wire_transmission();
-
   delay(1000);
-
   ec_wire_transmission();
-
   delay(1000);
-
   orp_wire_transmission();
-
   delay(1000);
-
   do_temp_wire_transmission();
-
   delay(1000);
-
   ec_temp_wire_transmission();
-
   delay(1000);
-
   do_15_wire_transmission();
-
   delay(1000);
-
   ph_temp_wire_transmission();
-
   delay(1000);
 
+  // Se lee la humedad, presión y temperatura interna
   env_pressure();
 
+  // Se leen los datos de temperatura y presión del medio ambiente
   get_atm_values();
 
+  // Se leen los datos obtenidos desde el módulo GPS
   get_gps_data();
 
+  // Se lee el nivel de voltaje de la batería
   read_battery_level();
 
+  // Se apagan los sensores Atlas Scientific
   sleep_sensors();
   digitalWrite(rtd_off_pin, LOW);
   digitalWrite(ph_off_pin, LOW);
@@ -197,6 +202,7 @@ void loop() {
   digitalWrite(ec_off_pin, LOW);
   digitalWrite(do_off_pin, LOW);
 
+  // Se imprimen los datos obtenidos desde los sensores en el puerto Serial 
   Serial.println("FLOAT DATA:");
   Serial.print(" [");
   for (int i = 0; i < _data_size ; i++) {
@@ -206,8 +212,11 @@ void loop() {
     }
   }
   Serial.println("]");
+
+  // Se almacenan los datos en la memoria SD
   write_to_sd(_data[0],_data[1],_data[2],_data[3],_data[4],_data[5],_data[6],_data[7],_data[8],_data[9],_data[10],_data[11], _data[12], _data[13], _data[14], _data[15], _data[16], _data[17], _data[18], _data[19], _data[20], _data[21]);
 
+  // Se transforman algunos datos de flotante a sus bytes componentes para enviarlos a través de LoRaWAN 
   float2Bytes(gps_latitude,&gps_latitude_float_bytes[0]);
   float2Bytes(gps_longitude,&gps_longitude_float_bytes[0]);
   float2Bytes(_data[2] /*EC*/,&ec_float_bytes[0]);
@@ -291,6 +300,7 @@ void loop() {
 
   
 
+  // Se imprimen los datos de LoRaWAN en hexadecimal 
   Serial.println("LORAWAN HEX DATA: ");
   
   for(int a = 0; a < sizeof(_data_lorawan); a++)
@@ -302,6 +312,7 @@ void loop() {
 
   Serial.println();
 
+  // Se envían los datos a través de LoRaWAN
   int err;
   modem.beginPacket();
   modem.write(_data_lorawan[0]);
@@ -363,6 +374,7 @@ void loop() {
     Serial.println("-- ERROR ENVIANDO EL MENSAJE A TRAVÉS DE LORAWAN --");
   }
 
+  // Se envía el sistema a dormir por la cantidad puesta en la variable sleep time
   //delay(360*1000);
   LowPower.sleep(sleep_time*60*1000); // e.g. 10 minutos * 60*segundos * 1000 milisegundos
 }

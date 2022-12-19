@@ -214,6 +214,20 @@ void send_lorawan_data()
   modem.write(_data_lorawan[32]);
   modem.write(_data_lorawan[33]);
   modem.write(_data_lorawan[34]);
+  modem.write(_data_lorawan[35]);
+  modem.write(_data_lorawan[36]);
+  modem.write(_data_lorawan[37]);
+  modem.write(_data_lorawan[38]);
+  modem.write(_data_lorawan[39]);
+  modem.write(_data_lorawan[40]);
+  modem.write(_data_lorawan[41]);
+  modem.write(_data_lorawan[42]);
+  modem.write(_data_lorawan[43]);
+  modem.write(_data_lorawan[44]);
+  modem.write(_data_lorawan[45]);
+  modem.write(_data_lorawan[46]);
+  modem.write(_data_lorawan[47]);
+  modem.write(_data_lorawan[48]);
   
   err = modem.endPacket(true);
 
