@@ -1,4 +1,4 @@
-// LoRaWAN
+// Datos LoRaWAN para el acceso a la red de los dispositivos
 LoRaModem modem;
 // String devEUI = "A8610A3233298409"; // --> ALPHA 
 // String devEUI = "A8610A3237277009"; // --> ATLAS 
@@ -23,7 +23,7 @@ float _data[_data_size];
 
 // Battery Level Reading
 int batt_reading = 0;
-  float batt_voltage = 0.0;
+float batt_voltage = 0.0;
 
 // GPS 
 TinyGPSPlus gps;

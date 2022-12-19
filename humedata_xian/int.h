@@ -70,6 +70,7 @@ void write_to_sd(float data0, float data1,float data2,float data3,float data4,
   SPI.end();
 }
 
+// Función para transformar un número flotante en sus bytes componentes
 void float2Bytes(float val,byte* bytes_array)
 {
   union {
@@ -80,6 +81,7 @@ void float2Bytes(float val,byte* bytes_array)
   memcpy(bytes_array, u.temp_array, 4);
 }
 
+// Función para transformar un arreglo de bytes en su correspondiente número flotante
 float bytes2Float(byte byte_0, byte byte_1, byte byte_2, byte byte_3)
 {
   long x = (long)byte_3<<24|(long)byte_2<<16|byte_1<<8|byte_0;
@@ -165,7 +167,6 @@ void send_lorawan_data()
   
   _data_lorawan[34] = uint8_t (sat_f * 255/150);                    // SAT
   
-
   Serial.println("LORAWAN HEX DATA: ");
   
   for(int a = 0; a < sizeof(_data_lorawan); a++)
@@ -240,6 +241,7 @@ void send_lorawan_data()
 
 void lorawan_begin()
 {
+  // Se inicia el módulo LoRaWAN con el estándar de Australia y 915 MHz
   if (!modem.begin(AU915)) {
     Serial.println("-- NO SE HA PODIDO INICIAR EL MÓDULO LORAWAN --");
     while (1) {}
@@ -253,7 +255,9 @@ void lorawan_begin()
   Serial.print(modem.deviceEUI());
   Serial.println(" --");
 
+  // Esta línea de código establece las frecuencias utilizadas por TTN y descarta las que no usa TTN
   Serial.println(modem.sendMask("ff000001f000ffff00020000"));
+  // Se conecta el módulo LoRaWAN a la red a través de OTAA (Over the air activation)
   int connected = modem.joinOTAA(appEui, appKey);
 
   Serial.print("-- CONNECTED STATUS: ");

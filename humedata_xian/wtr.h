@@ -1,9 +1,12 @@
 void read_xian_sensors()
 {
+  // Se apaga el módulo GPS para que no interfiera con la lectura de los sensores Xi'An
   digitalWrite(GPS_SWITCH, LOW);
+  // Se encienden los sensores Xi'An y también el módulo RS-485
   digitalWrite(XIAN_SWITCH, HIGH);
   digitalWrite(RS485_SWITCH, HIGH);
   delay(500);
+  // Se intenta un máximo de 5 veces la lecura de los sensores Xi'An
   while((orp_received == 0) && (reading_tries < 5))
     {
       for(int i=0; i<8; i++)
@@ -133,7 +136,8 @@ void read_xian_sensors()
     ec_received  = 0;
     orp_received = 0;
     reading_tries = 0;
-    
+
+    // Se apagan los sensores Xi'An y el módulo RS-485
     digitalWrite(XIAN_SWITCH, LOW);
     digitalWrite(RS485_SWITCH, LOW);
 }
