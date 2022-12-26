@@ -21,10 +21,12 @@ void setup()
   lorawan_begin();
   sd_begin();
   Wire.begin();
-}
+  delay(1000);
 
-void loop() 
-{
+  digitalWrite(GPS_SWITCH, HIGH);
+  read_xian_ec();
+  get_gps_data();
+  delay(1000);
   // Se leen los valores internos y los atmosféricos 
   env_pressure();
   get_atm_values();
@@ -34,12 +36,26 @@ void loop()
   // Se almacenan los datos en la memoria SD y se envían a través de LoRaWAN
   store_sd_data();
   send_lorawan_data();
-
   //delay((sleep_time - gps_fix_time)*60*1000);
   LowPower.sleep((sleep_time - gps_fix_time)*60*1000);
+}
+
+void loop() 
+{
   digitalWrite(GPS_SWITCH, HIGH);
   //delay(gps_fix_time*60*1000);
   LowPower.sleep(gps_fix_time*60*1000);
   read_xian_ec();
   get_gps_data();
+  // Se leen los valores internos y los atmosféricos 
+  env_pressure();
+  get_atm_values();
+  read_battery_level();
+  // Se leen los valores de los sensores acuáticos
+  read_xian_sensors();
+  // Se almacenan los datos en la memoria SD y se envían a través de LoRaWAN
+  store_sd_data();
+  send_lorawan_data();
+  //delay((sleep_time - gps_fix_time)*60*1000);
+  LowPower.sleep((sleep_time - gps_fix_time)*60*1000);
 }
