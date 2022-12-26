@@ -40,5 +40,6 @@ void loop()
   digitalWrite(GPS_SWITCH, HIGH);
   //delay(gps_fix_time*60*1000);
   LowPower.sleep(gps_fix_time*60*1000);
+  read_xian_ec();
   get_gps_data();
 }

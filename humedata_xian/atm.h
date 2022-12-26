@@ -18,10 +18,12 @@ void get_gps_data(){
   digitalWrite(XIAN_SWITCH, LOW);
   digitalWrite(RS485_SWITCH, LOW);
   digitalWrite(GPS_SWITCH, HIGH);
+  delay(1000);
   while(Serial1.available() > 0){
     if(gps.encode(Serial1.read())){
       gps_latitude = gps.location.lat();
       gps_longitude = gps.location.lng();
+      delay(1000);
     }
   }
   _data[11] = gps_longitude;

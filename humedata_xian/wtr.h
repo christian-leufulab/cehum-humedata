@@ -35,31 +35,6 @@ void read_xian_sensors()
     }
     
     reading_tries = 0;
-    while((ec_received == 0) && (reading_tries < 5))
-    {
-      for(int i=0; i<8; i++)
-      {
-        Serial1.write(request_ec[i]);
-      }
-        if(Serial1.available() > 0)
-        {
-          Serial1.readBytes(ec_readings, 50);
-          ec_f = bytes2Float(ec_readings[3], ec_readings[4], ec_readings[5], ec_readings[6]);
-          ec_received = 1;
-        }
-        else
-        {
-          delay(1000);
-          ec_readings[3] = 0;
-          ec_readings[4] = 0;
-          ec_readings[5] = 0;
-          ec_readings[6] = 0;
-          ec_f = bytes2Float(ec_readings[3], ec_readings[4], ec_readings[5], ec_readings[6]);
-          reading_tries++;
-        }
-    }
-    
-    reading_tries = 0;
     while((ph_received == 0) && (reading_tries < 5))
     {
       for(int i=0; i<8; i++)
@@ -123,7 +98,6 @@ void read_xian_sensors()
 
     _data[0] = do_f;
     _data[1] = ph_f;
-    _data[2] = ec_f;
     _data[3] = 0;
     _data[4] = 0;
     _data[5] = 0;
@@ -133,11 +107,51 @@ void read_xian_sensors()
       
     do_received  = 0;
     ph_received  = 0;
-    ec_received  = 0;
     orp_received = 0;
     reading_tries = 0;
 
     // Se apagan los sensores Xi'An y el módulo RS-485
     digitalWrite(XIAN_SWITCH, LOW);
     digitalWrite(RS485_SWITCH, LOW);
+}
+
+void read_xian_ec()
+{
+  // Se apaga el módulo GPS para que no interfiera con la lectura de los sensores Xi'An
+  digitalWrite(GPS_SWITCH, LOW);
+  // Se encienden los sensores Xi'An y también el módulo RS-485
+  digitalWrite(XIAN_SWITCH, HIGH);
+  digitalWrite(RS485_SWITCH, HIGH);
+  delay(500);
+  // Se intenta un máximo de 5 veces la lecura de los sensores Xi'An
+  reading_tries = 0;
+  while((ec_received == 0) && (reading_tries < 5))
+  {
+    for(int i=0; i<8; i++)
+    {
+      Serial1.write(request_ec[i]);
+    }
+      if(Serial1.available() > 0)
+      {
+        Serial1.readBytes(ec_readings, 50);
+        ec_f = bytes2Float(ec_readings[3], ec_readings[4], ec_readings[5], ec_readings[6]);
+        ec_received = 1;
+      }
+      else
+      {
+        delay(1000);
+        ec_readings[3] = 0;
+        ec_readings[4] = 0;
+        ec_readings[5] = 0;
+        ec_readings[6] = 0;
+        ec_f = bytes2Float(ec_readings[3], ec_readings[4], ec_readings[5], ec_readings[6]);
+        reading_tries++;
+      }
+  }
+  _data[2] = ec_f;
+  ec_received  = 0;
+  reading_tries = 0;
+  // Se apagan los sensores Xi'An y el módulo RS-485
+  digitalWrite(XIAN_SWITCH, LOW);
+  digitalWrite(RS485_SWITCH, LOW);
 }
