@@ -17,6 +17,7 @@ const int GPS_SWITCH = A5;
 const int RS485_SWITCH = A6;
 const int SD_CS_PIN = 4;
 const int MAX_3485_EN = 3;
+const int EC_SWITCH = 0;
 
 void declare_pins()
 {
@@ -24,8 +25,10 @@ void declare_pins()
   pinMode(GPS_SWITCH, OUTPUT);
   pinMode(MAX_3485_EN, OUTPUT);
   pinMode(RS485_SWITCH, OUTPUT);
+  pinMode(EC_SWITCH, OUTPUT);
   digitalWrite(XIAN_SWITCH, LOW);
   digitalWrite(GPS_SWITCH, LOW);
   digitalWrite(MAX_3485_EN, LOW);
   digitalWrite(RS485_SWITCH, LOW);
+  digitalWrite(EC_SWITCH, LOW);
 }
