@@ -29,6 +29,7 @@ float batt_voltage = 0.0;
 TinyGPSPlus gps;
 float gps_latitude = 0.0;
 float gps_longitude = 0.0;
+float _seconds, _minutes, _hour, _day, _month, _year;
 byte gps_latitude_float_bytes[4];
 byte gps_longitude_float_bytes[4];
 

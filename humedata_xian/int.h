@@ -23,7 +23,8 @@ void read_battery_level()
 void write_to_sd(float data0, float data1,float data2,float data3,float data4,
                 float data5, float data6, float data7, float data8, float data9,
                 float data10, float data11, float data12, float data13, float data14,
-                float data15, float data16) 
+                float data15, float data16, float data17, float data18, float data19,
+                float data20, float data21, float data22) 
 {
   SPI.begin();
   delay(100);
@@ -63,7 +64,19 @@ void write_to_sd(float data0, float data1,float data2,float data3,float data4,
   dataFile.print(",");
   dataFile.print(data15);
   dataFile.print(",");
-  dataFile.println(data16);
+  dataFile.print(data16);
+  dataFile.print(",");
+  dataFile.print(data17);
+  dataFile.print(",");
+  dataFile.print(data18);
+  dataFile.print(",");
+  dataFile.print(data19);
+  dataFile.print(",");
+  dataFile.print(data20);
+  dataFile.print(",");
+  dataFile.print(data21);
+  dataFile.print(",");
+  dataFile.println(data22);
 
   dataFile.close();
   delay(1000);
@@ -106,7 +119,9 @@ void store_sd_data()
   }
   Serial.println("]");
 
-  write_to_sd(_data[0],_data[1],_data[2],_data[3],_data[4],_data[5],_data[6],_data[7],_data[8],_data[9],_data[10],_data[11], _data[12], _data[13], _data[14], _data[15], _data[16]);
+  write_to_sd(_data[0],_data[1],_data[2],_data[3],_data[4],_data[5],_data[6],_data[7],_data[8],
+  _data[9],_data[10],_data[11], _data[12], _data[13], _data[14], _data[15], _data[16], _year,
+  _month, _day, _hour, _minutes, _seconds);
 }
 
 void send_lorawan_data()
@@ -272,7 +287,7 @@ void sd_begin()
   SD.begin(SD_CS_PIN);
   dataFile = SD.open("log-0000.csv", FILE_WRITE);
   delay(1000);
-  dataFile.println("DissolvedOxygen,pH,ElectricalConductivity,TotalDissolvedSolids,Salinity,RelativeDensity,WaterTemperature,InternalPressure,AtmosphericPressure,AtmosphericTemperature,Latitude,Longitude,InternalTemperature,InternalHumidity,BatteryLevel,ORP,Saturation");
+  dataFile.println("DissolvedOxygen,pH,ElectricalConductivity,TotalDissolvedSolids,Salinity,RelativeDensity,WaterTemperature,InternalPressure,AtmosphericPressure,AtmosphericTemperature,Latitude,Longitude,InternalTemperature,InternalHumidity,BatteryLevel,ORP,Saturation,Year,Month,Day,Hour,Minutes,Seconds");
   dataFile.close();
   delay(100);
   SPI.end();

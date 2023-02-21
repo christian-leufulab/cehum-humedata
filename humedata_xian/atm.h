@@ -22,6 +22,12 @@ void get_gps_data(){
     if(gps.encode(Serial1.read())){
       gps_latitude = gps.location.lat();
       gps_longitude = gps.location.lng();
+      _year = gps.date.year();
+      _month = gps.date.month();
+      _day = gps.date.day();
+      _hour = gps.time.hour();
+      _minutes = gps.time.minute();
+      _seconds = gps.time.second();
       delay(1000);
     }
   }
