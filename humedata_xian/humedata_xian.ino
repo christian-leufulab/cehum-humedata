@@ -7,7 +7,7 @@
 #include "libs.h"
 
 // Se declaran los tiempos de lectura y adquisición de GPS para el dispositivo
-const int sleep_time = 5; 
+const int sleep_time = 10; 
 const int gps_fix_time = 3;
 
 void setup() 
@@ -24,7 +24,6 @@ void setup()
   delay(1000);
 
   digitalWrite(GPS_SWITCH, HIGH);
-  read_xian_ec();
   get_gps_data();
   delay(1000);
   // Se leen los valores internos y los atmosféricos 
@@ -32,6 +31,7 @@ void setup()
   get_atm_values();
   read_battery_level();
   // Se leen los valores de los sensores acuáticos
+  read_xian_ec();
   read_xian_sensors();
   // Se almacenan los datos en la memoria SD y se envían a través de LoRaWAN
   store_sd_data();
